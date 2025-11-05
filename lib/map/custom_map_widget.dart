@@ -41,24 +41,27 @@ class _CustomMapWidgetState extends State<CustomMapWidget> {
         _locationPermissionGranted = true;
       });
 
-      // If map is already initialized, enable location and move to user
       if (_mapboxMap != null) {
-        await _enableUserLocationOnMap();
+        await _updateMapSettings();
       }
     } else {
-      // Permission denied, stays on default France location
+      // Permission denied, stays on default location
       setState(() {
         _locationPermissionGranted = false;
       });
     }
   }
 
-  Future<void> _enableUserLocationOnMap() async {
+  Future<void> _updateMapSettings() async {
     try {
       if (_mapboxMap == null) return;
 
       await _mapboxMap!.location.updateSettings(
         LocationComponentSettings(enabled: true, pulsingEnabled: true),
+      );
+
+      await _mapboxMap!.compass.updateSettings(
+        CompassSettings(enabled: true, position: OrnamentPosition.BOTTOM_RIGHT),
       );
     } catch (e) {
       debugPrint('Error enabling user location: $e');
