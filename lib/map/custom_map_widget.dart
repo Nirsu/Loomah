@@ -15,6 +15,7 @@ class CustomMapWidget extends StatefulWidget {
 
 class _CustomMapWidgetState extends State<CustomMapWidget> {
   MapboxMap? _mapboxMap;
+  PointAnnotationManager? pointAnnotationManager;
   bool _locationPermissionGranted = false;
 
   final CameraOptions _defaultCameraOptions = CameraOptions(
@@ -68,8 +69,26 @@ class _CustomMapWidgetState extends State<CustomMapWidget> {
     }
   }
 
-  void _onMapCreated(MapboxMap mapboxMap) {
+  Future<void> _onMapCreated(MapboxMap mapboxMap) async {
     _mapboxMap = mapboxMap;
+
+    await _mapboxMap!.loadStyleURI(
+      'mapbox://styles/meruto/cmiyi6xhv001e01r49pwo4vkv',
+    );
+
+    pointAnnotationManager = await mapboxMap.annotations
+        .createPointAnnotationManager();
+
+    final PointAnnotationOptions pointAnnotationOptions =
+        PointAnnotationOptions(
+          geometry: Point(coordinates: Position(2.3718951, 48.8334931)),
+          iconImage: 'restaurant',
+          textField: 'La Felicità',
+          textAnchor: TextAnchor.TOP,
+          textOffset: <double?>[0, 0.5],
+        );
+
+    pointAnnotationManager?.create(pointAnnotationOptions);
   }
 
   @override
