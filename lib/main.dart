@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loomah/env/env.dart';
 import 'package:loomah/map/custom_map_widget.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
@@ -8,7 +9,7 @@ void main() {
 
   MapboxOptions.setAccessToken(Env.mapboxAccessToken);
 
-  runApp(MyApp());
+  runApp(ProviderScope(child: MyApp()));
 }
 
 /// The main application widget.

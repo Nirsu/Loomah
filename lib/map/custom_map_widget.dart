@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
@@ -15,8 +16,11 @@ class CustomMapWidget extends StatefulWidget {
 
 class _CustomMapWidgetState extends State<CustomMapWidget> {
   MapboxMap? _mapboxMap;
-  PointAnnotationManager? pointAnnotationManager;
   bool _locationPermissionGranted = false;
+
+  // IDs pour les sources et layers
+  static const String _placesSourceId = 'places-source';
+  static const String _placesLayerId = 'places-layer';
 
   final CameraOptions _defaultCameraOptions = CameraOptions(
     // Default center coordinates: Paris, France (latitude 48.85887, longitude 2.34704)
@@ -76,19 +80,43 @@ class _CustomMapWidgetState extends State<CustomMapWidget> {
       'mapbox://styles/meruto/cmiyi6xhv001e01r49pwo4vkv',
     );
 
-    pointAnnotationManager = await mapboxMap.annotations
-        .createPointAnnotationManager();
+    // Créer les données GeoJSON
+    final Map<String, dynamic> geoJson = <String, dynamic>{
+      'type': 'FeatureCollection',
+      'features': <Map<String, Object>>[
+        <String, Object>{
+          'type': 'Feature',
+          'geometry': <String, Object>{
+            'type': 'Point',
+            'coordinates': <double>[2.3718951, 48.8334931],
+          },
+          'properties': <String, String>{
+            'name': 'La Felicità',
+            'icon': 'restaurant',
+          },
+        },
+      ],
+    };
 
-    final PointAnnotationOptions pointAnnotationOptions =
-        PointAnnotationOptions(
-          geometry: Point(coordinates: Position(2.3718951, 48.8334931)),
-          iconImage: 'restaurant',
-          textField: 'La Felicità',
-          textAnchor: TextAnchor.TOP,
-          textOffset: <double?>[0, 0.5],
-        );
+    // Ajouter la source GeoJSON
+    await _mapboxMap!.style.addSource(
+      GeoJsonSource(id: _placesSourceId, data: jsonEncode(geoJson)),
+    );
 
-    pointAnnotationManager?.create(pointAnnotationOptions);
+    // Layer avec icône ET texte (visible seulement à partir du zoom 12)
+    await _mapboxMap!.style.addLayer(
+      SymbolLayer(
+        id: _placesLayerId,
+        sourceId: _placesSourceId,
+        iconImage: '{icon}',
+        iconSize: 1,
+        textField: '{name}',
+        textAnchor: TextAnchor.TOP,
+        textOffset: <double?>[0, 0.5],
+        textSize: 14,
+        minZoom: 13 ,
+      ),
+    );
   }
 
   @override
