@@ -2,21 +2,29 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:loomah/features/map/data/models/nearby_places_request_model.dart';
+import 'package:loomah/features/map/data/models/place_collection.dart';
+import 'package:loomah/features/map/data/providers/nearby_places_provider.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+/// Default radius for nearby places search (10km)
+const int kDefaultRadius = 10000;
+
 /// A custom map widget that displays a Mapbox map.
-class CustomMapWidget extends StatefulWidget {
+class CustomMapWidget extends ConsumerStatefulWidget {
   /// Creates a [CustomMapWidget].
   const CustomMapWidget({super.key});
 
   @override
-  State<CustomMapWidget> createState() => _CustomMapWidgetState();
+  ConsumerState<CustomMapWidget> createState() => _CustomMapWidgetState();
 }
 
-class _CustomMapWidgetState extends State<CustomMapWidget> {
+class _CustomMapWidgetState extends ConsumerState<CustomMapWidget> {
   MapboxMap? _mapboxMap;
   bool _locationPermissionGranted = false;
+  bool _hasInitializedLocation = false;
 
   // Source and layer IDs
   static const String _placesSourceId = 'places-source';
@@ -59,7 +67,8 @@ class _CustomMapWidgetState extends State<CustomMapWidget> {
 
   Future<void> _updateMapSettings() async {
     try {
-      if (_mapboxMap == null) return;
+      if (_mapboxMap == null || _hasInitializedLocation) return;
+      _hasInitializedLocation = true;
 
       await _mapboxMap!.location.updateSettings(
         LocationComponentSettings(enabled: true, pulsingEnabled: true),
@@ -68,8 +77,70 @@ class _CustomMapWidgetState extends State<CustomMapWidget> {
       await _mapboxMap!.compass.updateSettings(
         CompassSettings(enabled: true, position: OrnamentPosition.BOTTOM_RIGHT),
       );
+
+      await _fetchNearbyPlaces();
     } catch (e) {
       debugPrint('Error enabling user location: $e');
+    }
+  }
+
+  Future<void> _fetchNearbyPlaces() async {
+    try {
+      if (_mapboxMap == null) return;
+
+      // Get the camera center (user's position when using FollowPuckViewportState)
+      final CameraState cameraState = await _mapboxMap!.getCameraState();
+      final Position userPosition = cameraState.center.coordinates;
+
+      final NearbyPlacesRequestModel request = NearbyPlacesRequestModel(
+        latitude: userPosition.lat.toDouble(),
+        longitude: userPosition.lng.toDouble(),
+        radius: kDefaultRadius,
+      );
+
+      final PlaceCollection places = await ref.read(
+        nearbyPlacesProvider(request).future,
+      );
+
+      await _displayPlaces(places);
+    } catch (e) {
+      debugPrint('Error fetching nearby places: $e');
+    }
+  }
+
+  Future<void> _displayPlaces(PlaceCollection places) async {
+    if (_mapboxMap == null) return;
+
+    final String geoJsonString = jsonEncode(places.toJson());
+
+    // Check if source already exists, update it or create it
+    final bool sourceExists = await _mapboxMap!.style.styleSourceExists(
+      _placesSourceId,
+    );
+
+    if (sourceExists) {
+      final GeoJsonSource source =
+          (await _mapboxMap!.style.getSource(_placesSourceId))!
+              as GeoJsonSource;
+      await source.updateGeoJSON(geoJsonString);
+    } else {
+      await _mapboxMap!.style.addSource(
+        GeoJsonSource(id: _placesSourceId, data: geoJsonString),
+      );
+
+      await _mapboxMap!.style.addLayer(
+        SymbolLayer(
+          id: _placesLayerId,
+          sourceId: _placesSourceId,
+          iconImage: '{icon}',
+          iconSize: 1,
+          textField: '{name}',
+          textAnchor: TextAnchor.TOP,
+          textOffset: <double?>[0, 0.5],
+          textSize: 14,
+          minZoom: 12,
+        ),
+      );
     }
   }
 
@@ -80,43 +151,9 @@ class _CustomMapWidgetState extends State<CustomMapWidget> {
       'mapbox://styles/meruto/cmiyi6xhv001e01r49pwo4vkv',
     );
 
-    // Create GeoJSON data
-    final Map<String, dynamic> geoJson = <String, dynamic>{
-      'type': 'FeatureCollection',
-      'features': <Map<String, Object>>[
-        <String, Object>{
-          'type': 'Feature',
-          'geometry': <String, Object>{
-            'type': 'Point',
-            'coordinates': <double>[2.3718951, 48.8334931],
-          },
-          'properties': <String, String>{
-            'name': 'La Felicità',
-            'icon': 'restaurant',
-          },
-        },
-      ],
-    };
-
-    // Add GeoJSON source
-    await _mapboxMap!.style.addSource(
-      GeoJsonSource(id: _placesSourceId, data: jsonEncode(geoJson)),
-    );
-
-    // Symbol layer with icon AND text (visible only from zoom 13)
-    await _mapboxMap!.style.addLayer(
-      SymbolLayer(
-        id: _placesLayerId,
-        sourceId: _placesSourceId,
-        iconImage: '{icon}',
-        iconSize: 1,
-        textField: '{name}',
-        textAnchor: TextAnchor.TOP,
-        textOffset: <double?>[0, 0.5],
-        textSize: 14,
-        minZoom: 13,
-      ),
-    );
+    if (_locationPermissionGranted) {
+      await _updateMapSettings();
+    }
   }
 
   @override
