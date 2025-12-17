@@ -18,7 +18,7 @@ class _CustomMapWidgetState extends State<CustomMapWidget> {
   MapboxMap? _mapboxMap;
   bool _locationPermissionGranted = false;
 
-  // IDs pour les sources et layers
+  // Source and layer IDs
   static const String _placesSourceId = 'places-source';
   static const String _placesLayerId = 'places-layer';
 
@@ -80,7 +80,7 @@ class _CustomMapWidgetState extends State<CustomMapWidget> {
       'mapbox://styles/meruto/cmiyi6xhv001e01r49pwo4vkv',
     );
 
-    // Créer les données GeoJSON
+    // Create GeoJSON data
     final Map<String, dynamic> geoJson = <String, dynamic>{
       'type': 'FeatureCollection',
       'features': <Map<String, Object>>[
@@ -98,12 +98,12 @@ class _CustomMapWidgetState extends State<CustomMapWidget> {
       ],
     };
 
-    // Ajouter la source GeoJSON
+    // Add GeoJSON source
     await _mapboxMap!.style.addSource(
       GeoJsonSource(id: _placesSourceId, data: jsonEncode(geoJson)),
     );
 
-    // Layer avec icône ET texte (visible seulement à partir du zoom 12)
+    // Symbol layer with icon AND text (visible only from zoom 13)
     await _mapboxMap!.style.addLayer(
       SymbolLayer(
         id: _placesLayerId,
@@ -114,7 +114,7 @@ class _CustomMapWidgetState extends State<CustomMapWidget> {
         textAnchor: TextAnchor.TOP,
         textOffset: <double?>[0, 0.5],
         textSize: 14,
-        minZoom: 13 ,
+        minZoom: 13,
       ),
     );
   }
