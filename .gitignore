@@ -50,3 +50,6 @@ app.*.map.json
 
 # Env
 .env
+
+# VS Code settings
+.vscode/
