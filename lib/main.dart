@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loomah/env/env.dart';
-import 'package:loomah/features/map/presentation/widgets/custom_map_widget.dart';
+import 'package:loomah/features/home/presentation/pages/home_page.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:marionette_flutter/marionette_flutter.dart';
 
@@ -25,6 +25,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: SafeArea(top: false, child: CustomMapWidget()));
+    return const MaterialApp(home: HomePage());
   }
 }
