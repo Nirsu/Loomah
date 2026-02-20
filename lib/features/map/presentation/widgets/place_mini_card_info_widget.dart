@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:loomah/features/map/domain/models/place_mini_card_info.dart';
+import 'package:loomah/theme/loomah_theme.dart';
 
 /// A widget that displays a mini card with information about a place.
 class PlaceMiniCardInfoWidget extends StatelessWidget {
@@ -22,6 +23,9 @@ class PlaceMiniCardInfoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final LoomahPalette palette = Theme.of(context).extension<LoomahPalette>()!;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
     // TapRegion permet de détecter les clics en dehors de ce widget
     // pour le fermer automatiquement.
     return TapRegion(
@@ -30,16 +34,15 @@ class PlaceMiniCardInfoWidget extends StatelessWidget {
       },
       child: Container(
         width: 320, // Largeur fixe pour la carte
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.black87, width: 2.5),
-          boxShadow: const <BoxShadow>[
+          color: palette.background,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: <BoxShadow>[
             BoxShadow(
-              color: Colors.black12,
-              blurRadius: 10,
-              offset: Offset(0, 4),
+              color: palette.foreground.withOpacity(0.08),
+              blurRadius: 24,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
@@ -52,39 +55,75 @@ class PlaceMiniCardInfoWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(
-                  info.typeText,
-                  style: const TextStyle(fontSize: 14, color: Colors.black87),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: palette.pastelPeach,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    info.typeText,
+                    style: textTheme.labelMedium?.copyWith(
+                      color: palette.accentPrimary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                 ),
                 GestureDetector(
                   onTap: onClose,
-                  child: const Icon(
-                    Icons.close,
-                    size: 24,
-                    color: Colors.black87,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: palette.foreground.withOpacity(0.05),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.close,
+                      size: 20,
+                      color: palette.textLight,
+                    ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 16),
 
             // Nom du lieu
             Text(
               info.placeName,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+              style: textTheme.titleLarge?.copyWith(
+                color: palette.textDark,
+                fontWeight: FontWeight.w800,
+                height: 1.2,
               ),
             ),
             const SizedBox(height: 8),
 
             // Adresse du lieu
-            Text(
-              info.address,
-              style: const TextStyle(fontSize: 14, color: Colors.black54),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Icon(
+                  Icons.location_on_outlined,
+                  size: 16,
+                  color: palette.textLight,
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    info.address,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: palette.textLight,
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
             // Bouton pour voir la fiche
             SizedBox(
@@ -92,20 +131,21 @@ class PlaceMiniCardInfoWidget extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: onSeeDetails,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(
-                    0xFFEAEAEA,
-                  ), // Gris clair comme sur l'image
-                  foregroundColor: Colors.black87,
+                  backgroundColor: palette.accentPrimary, // Orange du theme
+                  foregroundColor: palette.background, // Texte blanc/fond
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    side: const BorderSide(color: Colors.black87, width: 2),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                child: const Text(
-                  'Bouton pour voir fiche lieu',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                child: Text(
+                  'Voir la fiche',
+                  style: textTheme.labelLarge?.copyWith(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: palette.background,
+                  ),
                 ),
               ),
             ),
