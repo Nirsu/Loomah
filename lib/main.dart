@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loomah/env/env.dart';
 import 'package:loomah/features/home/presentation/pages/home_page.dart';
+import 'package:loomah/theme/loomah_theme.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:marionette_flutter/marionette_flutter.dart';
 
@@ -25,6 +26,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(home: HomePage());
+    return MaterialApp(theme: LoomahTheme.light(), home: const HomePage());
   }
 }
