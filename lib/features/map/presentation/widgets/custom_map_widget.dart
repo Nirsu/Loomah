@@ -32,6 +32,8 @@ class _CustomMapWidgetState extends ConsumerState<CustomMapWidget> {
   MapboxMap? _mapboxMap;
   bool _locationPermissionGranted = false;
   bool _hasInitializedLocation = false;
+  String? _selectedPlaceName;
+  bool _followUser = true;
 
   // Debounce timer for camera changes
   Timer? _debounceTimer;
@@ -108,6 +110,45 @@ class _CustomMapWidgetState extends ConsumerState<CustomMapWidget> {
       const Duration(milliseconds: kDebounceDuration),
       _checkAndRefetch,
     );
+  }
+
+  Future<void> _onMapTap(MapContentGestureContext context) async {
+    if (_mapboxMap == null) return;
+
+    final List<QueriedRenderedFeature?> features = await _mapboxMap!
+        .queryRenderedFeatures(
+          RenderedQueryGeometry.fromScreenCoordinate(context.touchPosition),
+          RenderedQueryOptions(layerIds: <String>[_placesLayerId]),
+        );
+
+    final QueriedRenderedFeature? firstFeature = features.firstWhere(
+      (QueriedRenderedFeature? item) => item != null,
+      orElse: () => null,
+    );
+
+    if (firstFeature == null) {
+      setState(() {
+        _selectedPlaceName = null;
+        _followUser = false;
+      });
+      return;
+    }
+
+    final String? name = _extractPlaceName(firstFeature.queriedFeature.feature);
+    setState(() {
+      _selectedPlaceName = name ?? 'Lieu';
+      _followUser = false;
+    });
+  }
+
+  String? _extractPlaceName(Map<String?, Object?> feature) {
+    final Object? properties = feature['properties'];
+    if (properties is Map) {
+      final Object? name = properties['name'];
+      return name?.toString();
+    }
+
+    return null;
   }
 
   Future<void> _checkAndRefetch() async {
@@ -256,16 +297,38 @@ class _CustomMapWidgetState extends ConsumerState<CustomMapWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return MapWidget(
-      cameraOptions: _defaultCameraOptions,
-      onMapCreated: _onMapCreated,
-      viewport: _locationPermissionGranted
-          ? FollowPuckViewportState(
-              zoom: 14,
-              bearing: FollowPuckViewportStateBearingConstant(0),
-              pitch: 0,
-            )
-          : null,
+    return Stack(
+      children: <Widget>[
+        MapWidget(
+          cameraOptions: _defaultCameraOptions,
+          onMapCreated: _onMapCreated,
+          onTapListener: _onMapTap,
+          viewport: _locationPermissionGranted && _followUser
+              ? FollowPuckViewportState(
+                  zoom: 14,
+                  bearing: FollowPuckViewportStateBearingConstant(0),
+                  pitch: 0,
+                )
+              : null,
+        ),
+        if (_selectedPlaceName != null)
+          Positioned(
+            left: 16,
+            right: 16,
+            bottom: 16,
+            child: Card(
+              elevation: 6,
+              // borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  _selectedPlaceName!,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
