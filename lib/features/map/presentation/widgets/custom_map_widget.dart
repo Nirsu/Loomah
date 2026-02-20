@@ -7,6 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loomah/features/map/data/models/nearby_places_request_model.dart';
 import 'package:loomah/features/map/data/models/place_collection.dart';
 import 'package:loomah/features/map/data/providers/nearby_places_provider.dart';
+import 'package:loomah/features/map/domain/models/place_mini_card_info.dart';
+import 'package:loomah/features/map/presentation/widgets/place_mini_card_info_widget.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -32,7 +34,7 @@ class _CustomMapWidgetState extends ConsumerState<CustomMapWidget> {
   MapboxMap? _mapboxMap;
   bool _locationPermissionGranted = false;
   bool _hasInitializedLocation = false;
-  String? _selectedPlaceName;
+  PlaceMiniCardInfo? _selectedPlaceInfo;
   bool _followUser = true;
 
   // Debounce timer for camera changes
@@ -128,27 +130,73 @@ class _CustomMapWidgetState extends ConsumerState<CustomMapWidget> {
 
     if (firstFeature == null) {
       setState(() {
-        _selectedPlaceName = null;
+        _selectedPlaceInfo = null;
         _followUser = false;
       });
       return;
     }
 
-    final String? name = _extractPlaceName(firstFeature.queriedFeature.feature);
+    final PlaceMiniCardInfo? info = _extractPlaceMiniInfo(
+      firstFeature.queriedFeature.feature,
+    );
     setState(() {
-      _selectedPlaceName = name ?? 'Lieu';
+      _selectedPlaceInfo = info;
       _followUser = false;
     });
   }
 
-  String? _extractPlaceName(Map<String?, Object?> feature) {
+  PlaceMiniCardInfo? _extractPlaceMiniInfo(Map<String?, Object?> feature) {
     final Object? properties = feature['properties'];
-    if (properties is Map) {
-      final Object? name = properties['name'];
-      return name?.toString();
+    if (properties is! Map) return null;
+
+    final String placeName =
+        properties['name']?.toString().trim().isNotEmpty == true
+        ? properties['name'].toString()
+        : 'Lieu';
+
+    final String iconName = properties['icon']?.toString() ?? '';
+    final String typeText = _textFromName(iconName);
+
+    final Object? addressRaw = properties['address'];
+    String addressText = 'Adresse indisponible';
+    if (addressRaw is Map) {
+      final String street = addressRaw['street']?.toString() ?? '';
+      final String city = addressRaw['city']?.toString() ?? '';
+      final String postalCode = addressRaw['postalCode']?.toString() ?? '';
+      final String country = addressRaw['country']?.toString() ?? '';
+
+      final List<String> parts = <String>[
+        if (street.isNotEmpty) street,
+        if (postalCode.isNotEmpty || city.isNotEmpty)
+          '$postalCode $city'.trim(),
+        if (country.isNotEmpty) country,
+      ];
+
+      if (parts.isNotEmpty) {
+        addressText = parts.join(', ');
+      }
     }
 
-    return null;
+    return PlaceMiniCardInfo(
+      typeText: typeText,
+      placeName: placeName,
+      address: addressText,
+    );
+  }
+
+  String _textFromName(String iconName) {
+    switch (iconName.toLowerCase()) {
+      case 'restaurant':
+        return 'Restaurant';
+      case 'park':
+        return 'Parc';
+      case 'museum':
+        return 'Musée';
+      case 'activity':
+        return 'Activité';
+      default:
+        return 'Lieu';
+    }
   }
 
   Future<void> _checkAndRefetch() async {
@@ -311,21 +359,21 @@ class _CustomMapWidgetState extends ConsumerState<CustomMapWidget> {
                 )
               : null,
         ),
-        if (_selectedPlaceName != null)
+        if (_selectedPlaceInfo != null)
           Positioned(
             left: 16,
             right: 16,
             bottom: 16,
-            child: Card(
-              elevation: 6,
-              // borderRadius: BorderRadius.circular(12),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(
-                  _selectedPlaceName!,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ),
+            child: PlaceMiniCardInfoWidget(
+              info: _selectedPlaceInfo!,
+              onClose: () {
+                setState(() {
+                  _selectedPlaceInfo = null;
+                });
+              },
+              onSeeDetails: () {
+                debugPrint('Open details for ${_selectedPlaceInfo?.placeName}');
+              },
             ),
           ),
       ],
