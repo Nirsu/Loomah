@@ -40,7 +40,7 @@ class PlaceMiniCardInfoWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(24),
           boxShadow: <BoxShadow>[
             BoxShadow(
-              color: palette.foreground.withOpacity(0.08),
+              color: palette.foreground.withValues(alpha: 0.08),
               blurRadius: 24,
               offset: const Offset(0, 8),
             ),
@@ -77,7 +77,7 @@ class PlaceMiniCardInfoWidget extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: palette.foreground.withOpacity(0.05),
+                      color: palette.foreground.withValues(alpha: 0.05),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
