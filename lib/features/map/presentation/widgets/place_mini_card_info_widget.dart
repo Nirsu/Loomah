@@ -26,14 +26,12 @@ class PlaceMiniCardInfoWidget extends StatelessWidget {
     final LoomahPalette palette = Theme.of(context).extension<LoomahPalette>()!;
     final TextTheme textTheme = Theme.of(context).textTheme;
 
-    // TapRegion permet de détecter les clics en dehors de ce widget
-    // pour le fermer automatiquement.
     return TapRegion(
       onTapOutside: (PointerDownEvent event) {
         onClose();
       },
       child: Container(
-        width: 320, // Largeur fixe pour la carte
+        width: 320,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: palette.background,
@@ -50,7 +48,6 @@ class PlaceMiniCardInfoWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            // Ligne du haut : Type (Texte) et Croix de fermeture
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,6 +60,9 @@ class PlaceMiniCardInfoWidget extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: palette.pastelPeach,
                     borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: palette.accentPrimary.withValues(alpha: 0.2),
+                    ),
                   ),
                   child: Text(
                     info.typeText,
@@ -74,24 +74,12 @@ class PlaceMiniCardInfoWidget extends StatelessWidget {
                 ),
                 GestureDetector(
                   onTap: onClose,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: palette.foreground.withValues(alpha: 0.05),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.close,
-                      size: 20,
-                      color: palette.textLight,
-                    ),
-                  ),
+                  child: Icon(Icons.close, size: 20, color: palette.textLight),
                 ),
               ],
             ),
             const SizedBox(height: 16),
 
-            // Nom du lieu
             Text(
               info.placeName,
               style: textTheme.titleLarge?.copyWith(
@@ -102,37 +90,22 @@ class PlaceMiniCardInfoWidget extends StatelessWidget {
             ),
             const SizedBox(height: 8),
 
-            // Adresse du lieu
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Icon(
-                  Icons.location_on_outlined,
-                  size: 16,
-                  color: palette.textLight,
-                ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    info.address,
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: palette.textLight,
-                      height: 1.4,
-                    ),
-                  ),
-                ),
-              ],
+            Text(
+              info.address,
+              style: textTheme.bodyMedium?.copyWith(
+                color: palette.textLight,
+                height: 1.4,
+              ),
             ),
             const SizedBox(height: 24),
 
-            // Bouton pour voir la fiche
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: onSeeDetails,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: palette.accentPrimary, // Orange du theme
-                  foregroundColor: palette.background, // Texte blanc/fond
+                  backgroundColor: palette.accentPrimary,
+                  foregroundColor: palette.background,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
