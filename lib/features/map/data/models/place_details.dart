@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:loomah/features/map/data/models/place_photo.dart';
 
 part 'place_details.freezed.dart';
 part 'place_details.g.dart';
@@ -14,7 +15,7 @@ abstract class PlaceDetails with _$PlaceDetails {
     required double latitude,
     required double longitude,
     required String description,
-    required List<String> photos,
+    required List<PlacePhoto> photos,
     Address? address,
     String? website,
     String? phone,
@@ -67,7 +68,7 @@ abstract class AgeRanges with _$AgeRanges {
   }) = _AgeRanges;
 
   /// Create an [AgeRanges] from a JSON.
-    factory AgeRanges.fromJson(Map<String, dynamic> json) =>
+  factory AgeRanges.fromJson(Map<String, dynamic> json) =>
       _$AgeRangesFromJson(json);
 }
 
