@@ -4,6 +4,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:loomah/features/map/data/models/nearby_places_request_model.dart';
 import 'package:loomah/features/map/data/models/place_collection.dart';
 import 'package:loomah/features/map/data/providers/nearby_places_provider.dart';
@@ -177,7 +178,11 @@ class _CustomMapWidgetState extends ConsumerState<CustomMapWidget> {
       }
     }
 
+    final String id =
+        feature['id']?.toString() ?? properties['id']?.toString() ?? '';
+
     return PlaceMiniCardInfo(
+      id: id,
       typeText: typeText,
       placeName: placeName,
       address: addressText,
@@ -372,7 +377,7 @@ class _CustomMapWidgetState extends ConsumerState<CustomMapWidget> {
                 });
               },
               onSeeDetails: () {
-                debugPrint('Open details for ${_selectedPlaceInfo?.placeName}');
+                unawaited(context.push('/places/${_selectedPlaceInfo!.id}'));
               },
             ),
           ),
