@@ -49,7 +49,7 @@ abstract class Address with _$Address {
 @freezed
 abstract class Pricing with _$Pricing {
   /// Default constructor.
-  const factory Pricing({required String kind, String? tier}) = _Pricing;
+  const factory Pricing({required String kind, int? tier}) = _Pricing;
 
   /// Create a [Pricing] from a JSON.
   factory Pricing.fromJson(Map<String, dynamic> json) =>
