@@ -45,11 +45,29 @@ abstract class Address with _$Address {
       _$AddressFromJson(json);
 }
 
+/// Kind of pricing.
+enum PricingKind {
+  /// Free pricing.
+  @JsonValue('FREE')
+  free,
+
+  /// Paid pricing.
+  @JsonValue('PAID')
+  paid,
+
+  /// Mixed pricing.
+  mixed,
+
+  /// Unknown pricing.
+  @JsonValue('UNKNOWN')
+  unknown,
+}
+
 /// Pricing of a place.
 @freezed
 abstract class Pricing with _$Pricing {
   /// Default constructor.
-  const factory Pricing({required String kind, int? tier}) = _Pricing;
+  const factory Pricing({required PricingKind kind, int? tier}) = _Pricing;
 
   /// Create a [Pricing] from a JSON.
   factory Pricing.fromJson(Map<String, dynamic> json) =>

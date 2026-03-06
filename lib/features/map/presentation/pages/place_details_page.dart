@@ -6,6 +6,7 @@ import 'package:loomah/features/map/presentation/widgets/image_carousel.dart';
 import 'package:loomah/features/map/presentation/widgets/place_badges_wrap.dart';
 import 'package:loomah/features/map/presentation/widgets/place_opening_hours.dart';
 import 'package:loomah/features/map/presentation/widgets/place_practical_info.dart';
+import 'package:loomah/features/map/presentation/widgets/place_pricing_info.dart';
 import 'package:loomah/theme/loomah_theme.dart';
 
 /// Page to display the details of a place.
@@ -73,6 +74,12 @@ class PlaceDetailsPage extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 32),
+                      if (place.pricing != null &&
+                          place.pricing!.kind !=
+                              PricingKind.unknown) ...<Widget>[
+                        PlacePricingInfo(pricing: place.pricing!),
+                        const SizedBox(height: 32),
+                      ],
                       PlacePracticalInfo(place: place),
                       const SizedBox(height: 32),
                       PlaceOpeningHours(openingHours: place.openingHours),
