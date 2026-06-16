@@ -20,7 +20,7 @@ dependencies:
   go_router: ^17.1.0
   json_annotation: ^4.9.0
   mapbox_maps_flutter: ^2.12.0
-  marionette_flutter: ^0.3.0
+  marionette_flutter: ^0.5.0
   permission_handler: ^12.0.1
   riverpod_annotation: ^3.0.3
   slang: ^4.12.1
@@ -36,7 +36,7 @@ dev_dependencies:
     sdk: flutter
   freezed: ^3.2.3
   json_serializable: ^6.11.2
-  marionette_mcp: ^0.3.0
+  marionette_mcp: ^0.5.0
   riverpod_generator: ^3.0.3
   theme_tailor: ^3.1.1
 
