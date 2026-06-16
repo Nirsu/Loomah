@@ -23,7 +23,7 @@ const double kMinDistanceToRefetch = 500;
 const double kMinZoomToFetch = 12;
 
 /// Keeps the selected place card visually clear of the floating bottom nav.
-const double kMapPlaceCardBottomOffset = 140;
+const double kMapPlaceCardBottomOffset = 112;
 
 /// A custom map widget that displays a Mapbox map.
 class CustomMapWidget extends ConsumerStatefulWidget {
@@ -340,9 +340,38 @@ class _CustomMapWidgetState extends ConsumerState<CustomMapWidget> {
       'mapbox://styles/meruto/cmiyi6xhv001e01r49pwo4vkv',
     );
 
+    await _updateMapOrnaments();
+
     if (_locationPermissionGranted) {
       await _updateMapSettings();
     }
+  }
+
+  Future<void> _updateMapOrnaments() async {
+    if (_mapboxMap == null) return;
+
+    final double topInset = MediaQuery.viewPaddingOf(context).top;
+    final double topMargin = topInset + 10;
+
+    await _mapboxMap!.scaleBar.updateSettings(
+      ScaleBarSettings(enabled: false),
+    );
+
+    await _mapboxMap!.logo.updateSettings(
+      LogoSettings(
+        position: OrnamentPosition.TOP_LEFT,
+        marginLeft: 12,
+        marginTop: topMargin,
+      ),
+    );
+
+    await _mapboxMap!.attribution.updateSettings(
+      AttributionSettings(
+        position: OrnamentPosition.TOP_RIGHT,
+        marginRight: 12,
+        marginTop: topMargin,
+      ),
+    );
   }
 
   @override

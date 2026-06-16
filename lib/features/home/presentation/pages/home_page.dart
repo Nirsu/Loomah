@@ -25,12 +25,17 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final double systemBottomPadding = MediaQuery.viewPaddingOf(context).bottom;
+
     return Scaffold(
       extendBody: true,
       body: SafeArea(
         top: false,
         bottom: false,
-        child: IndexedStack(index: _currentIndex, children: _pages),
+        child: Padding(
+          padding: EdgeInsets.only(bottom: systemBottomPadding),
+          child: IndexedStack(index: _currentIndex, children: _pages),
+        ),
       ),
       bottomNavigationBar: _LoomahBottomNavBar(
         currentIndex: _currentIndex,
