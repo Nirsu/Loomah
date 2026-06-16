@@ -22,6 +22,9 @@ const double kMinDistanceToRefetch = 500;
 /// Minimum zoom level to fetch places (below this, icons are hidden anyway)
 const double kMinZoomToFetch = 12;
 
+/// Keeps the selected place card visually clear of the floating bottom nav.
+const double kMapPlaceCardBottomOffset = 140;
+
 /// A custom map widget that displays a Mapbox map.
 class CustomMapWidget extends ConsumerStatefulWidget {
   /// Creates a [CustomMapWidget].
@@ -368,7 +371,7 @@ class _CustomMapWidgetState extends ConsumerState<CustomMapWidget> {
           Positioned(
             left: 16,
             right: 16,
-            bottom: 16,
+            bottom: kMapPlaceCardBottomOffset,
             child: PlaceMiniCardInfoWidget(
               info: _selectedPlaceInfo!,
               onClose: () {
