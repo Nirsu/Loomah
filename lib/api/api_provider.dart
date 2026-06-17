@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:loomah/env/env.dart';
+import 'package:loomah/features/auth/data/auth_token_storage.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:talker_dio_logger/talker_dio_logger.dart';
 
@@ -20,6 +21,21 @@ class ApiProvider extends _$ApiProvider {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
+      ),
+    );
+
+    dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest:
+            (RequestOptions options, RequestInterceptorHandler handler) async {
+              final String? token = await ref
+                  .read(authTokenStorageProvider)
+                  .readToken();
+              if (token != null && token.isNotEmpty) {
+                options.headers['Authorization'] = 'Bearer $token';
+              }
+              handler.next(options);
+            },
       ),
     );
 

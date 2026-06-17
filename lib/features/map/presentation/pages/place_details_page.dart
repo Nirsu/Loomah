@@ -14,6 +14,9 @@ class PlaceDetailsPage extends ConsumerWidget {
   /// Default constructor.
   const PlaceDetailsPage({required this.id, super.key});
 
+  /// Route path.
+  static const String route = '/places/:id';
+
   /// ID of the place to display.
   final String id;
 

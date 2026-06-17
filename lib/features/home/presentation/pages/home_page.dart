@@ -10,6 +10,9 @@ class HomePage extends StatefulWidget {
   /// Creates a [HomePage].
   const HomePage({super.key});
 
+  /// Route path.
+  static const String route = '/';
+
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -57,18 +60,9 @@ class _LoomahBottomNavBar extends StatelessWidget {
   final ValueChanged<int> onDestinationSelected;
 
   static const List<_NavDestination> _destinations = <_NavDestination>[
-    _NavDestination(
-      icon: LucideIcons.map_pinned,
-      label: 'Carte',
-    ),
-    _NavDestination(
-      icon: LucideIcons.heart,
-      label: 'Favoris',
-    ),
-    _NavDestination(
-      icon: LucideIcons.user_round,
-      label: 'Profil',
-    ),
+    _NavDestination(icon: LucideIcons.map_pinned, label: 'Carte'),
+    _NavDestination(icon: LucideIcons.heart, label: 'Favoris'),
+    _NavDestination(icon: LucideIcons.user_round, label: 'Profil'),
   ];
 
   @override
@@ -174,10 +168,12 @@ class _LoomahNavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final LoomahPalette palette = context.loomahPalette;
     final TextTheme textTheme = Theme.of(context).textTheme;
-    final Color foreground =
-        isSelected ? palette.accentSecondary : palette.textLight;
-    final FontWeight labelWeight =
-        isSelected ? FontWeight.w800 : FontWeight.w700;
+    final Color foreground = isSelected
+        ? palette.accentSecondary
+        : palette.textLight;
+    final FontWeight labelWeight = isSelected
+        ? FontWeight.w800
+        : FontWeight.w700;
 
     return Semantics(
       selected: isSelected,
@@ -225,10 +221,7 @@ class _LoomahNavItem extends StatelessWidget {
 }
 
 class _NavDestination {
-  const _NavDestination({
-    required this.icon,
-    required this.label,
-  });
+  const _NavDestination({required this.icon, required this.label});
 
   final IconData icon;
   final String label;
