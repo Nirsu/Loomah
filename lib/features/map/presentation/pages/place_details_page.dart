@@ -1,6 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:loomah/features/favorite/data/models/favorite_item.dart';
+import 'package:loomah/features/favorite/data/providers/favorites_provider.dart';
 import 'package:loomah/features/map/data/models/place_details.dart';
+import 'package:loomah/features/map/data/models/place_photo.dart';
 import 'package:loomah/features/map/data/providers/place_details_provider.dart';
 import 'package:loomah/features/map/presentation/widgets/image_carousel.dart';
 import 'package:loomah/features/map/presentation/widgets/place_badges_wrap.dart';
@@ -17,6 +22,9 @@ class PlaceDetailsPage extends ConsumerWidget {
   /// Route path.
   static const String route = '/places/:id';
 
+  /// Location for a place details page.
+  static String location(String id) => '/places/$id';
+
   /// ID of the place to display.
   final String id;
 
@@ -24,6 +32,12 @@ class PlaceDetailsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AsyncValue<PlaceDetails> placeDetailsAsync = ref.watch(
       placeDetailsProvider(id),
+    );
+    final AsyncValue<List<FavoriteItem>> favoritesAsync = ref.watch(
+      favoritesProvider,
+    );
+    final AsyncValue<void> favoriteAction = ref.watch(
+      favoriteControllerProvider,
     );
 
     final LoomahPalette palette = Theme.of(context).extension<LoomahPalette>()!;
@@ -37,17 +51,38 @@ class PlaceDetailsPage extends ConsumerWidget {
             slivers: <Widget>[
               SliverAppBar(
                 expandedHeight: 250,
+                toolbarHeight: 112,
                 pinned: true,
-                flexibleSpace: FlexibleSpaceBar(
-                  background: ImageCarousel(photos: place.photos),
-                ),
-                leading: IconButton(
-                  icon: Icon(
-                    Icons.arrow_back_ios_new_rounded,
-                    color: palette.textDark,
-                  ),
-                  style: IconButton.styleFrom(backgroundColor: palette.glassBg),
-                  onPressed: () => Navigator.of(context).pop(),
+                automaticallyImplyLeading: false,
+                backgroundColor: Colors.transparent,
+                surfaceTintColor: Colors.transparent,
+                forceMaterialTransparency: true,
+                flexibleSpace: Stack(
+                  fit: StackFit.expand,
+                  children: <Widget>[
+                    ImageCarousel(photos: place.photos ?? const <PlacePhoto>[]),
+                    Positioned(
+                      top: MediaQuery.viewPaddingOf(context).top + 12,
+                      left: 4,
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          color: palette.textDark,
+                        ),
+                        style: _topButtonStyle(),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ),
+                    Positioned(
+                      top: MediaQuery.viewPaddingOf(context).top + 12,
+                      right: 8,
+                      child: _FavoriteActionButton(
+                        placeId: place.id,
+                        favorites: favoritesAsync,
+                        isBusy: favoriteAction.isLoading,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               SliverToBoxAdapter(
@@ -86,7 +121,9 @@ class PlaceDetailsPage extends ConsumerWidget {
                       PlacePracticalInfo(place: place),
                       const SizedBox(height: 32),
                       PlaceOpeningHours(openingHours: place.openingHours),
-                      const SizedBox(height: 48),
+                      SizedBox(
+                        height: 48 + MediaQuery.viewPaddingOf(context).bottom,
+                      ),
                     ],
                   ),
                 ),
@@ -107,4 +144,52 @@ class PlaceDetailsPage extends ConsumerWidget {
       ),
     );
   }
+}
+
+class _FavoriteActionButton extends ConsumerWidget {
+  const _FavoriteActionButton({
+    required this.placeId,
+    required this.favorites,
+    required this.isBusy,
+  });
+
+  final String placeId;
+  final AsyncValue<List<FavoriteItem>> favorites;
+  final bool isBusy;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final LoomahPalette palette = context.loomahPalette;
+    final bool isFavorite =
+        favorites.whenOrNull(
+          data: (List<FavoriteItem> items) =>
+              items.any((FavoriteItem item) => item.place.id == placeId),
+        ) ??
+        false;
+
+    return IconButton(
+      onPressed: isBusy
+          ? null
+          : () {
+              unawaited(
+                ref
+                    .read(favoriteControllerProvider.notifier)
+                    .toggle(placeId: placeId, isFavorite: isFavorite),
+              );
+            },
+      icon: Icon(
+        isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+      ),
+      color: isFavorite ? palette.accentPrimary : palette.textDark,
+      style: _topButtonStyle(),
+    );
+  }
+}
+
+ButtonStyle _topButtonStyle() {
+  return IconButton.styleFrom(
+    backgroundColor: Colors.white,
+    shadowColor: Colors.black.withValues(alpha: .08),
+    elevation: 4,
+  );
 }

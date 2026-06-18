@@ -91,15 +91,18 @@ class _DayRow extends StatelessWidget {
   });
 
   final String day;
-  final List<OpeningPeriod> periods;
+  final List<OpeningPeriod>? periods;
   final LoomahPalette palette;
   final TextTheme textTheme;
 
   @override
   Widget build(BuildContext context) {
-    final String timeText = periods.isEmpty
+    final List<OpeningPeriod> dayPeriods = periods ?? const <OpeningPeriod>[];
+    final String timeText = dayPeriods.isEmpty
         ? 'FERMÉ'
-        : periods.map((OpeningPeriod p) => '${p.open} - ${p.close}').join(', ');
+        : dayPeriods
+              .map((OpeningPeriod p) => '${p.open} - ${p.close}')
+              .join(', ');
 
     return Row(
       children: <Widget>[

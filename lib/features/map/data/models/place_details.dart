@@ -15,7 +15,7 @@ abstract class PlaceDetails with _$PlaceDetails {
     required double latitude,
     required double longitude,
     required String description,
-    required List<PlacePhoto> photos,
+    List<PlacePhoto>? photos,
     Address? address,
     String? website,
     String? phone,
@@ -96,13 +96,13 @@ abstract class OpeningHours with _$OpeningHours {
   /// Default constructor.
   const factory OpeningHours({
     required String timezone,
-    required List<OpeningPeriod> monday,
-    required List<OpeningPeriod> tuesday,
-    required List<OpeningPeriod> wednesday,
-    required List<OpeningPeriod> thursday,
-    required List<OpeningPeriod> friday,
-    required List<OpeningPeriod> saturday,
-    required List<OpeningPeriod> sunday,
+    List<OpeningPeriod>? monday,
+    List<OpeningPeriod>? tuesday,
+    List<OpeningPeriod>? wednesday,
+    List<OpeningPeriod>? thursday,
+    List<OpeningPeriod>? friday,
+    List<OpeningPeriod>? saturday,
+    List<OpeningPeriod>? sunday,
   }) = _OpeningHours;
 
   /// Create an [OpeningHours] from a JSON.

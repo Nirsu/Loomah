@@ -52,7 +52,6 @@ class _ImageCarouselState extends State<ImageCarousel> {
           itemCount: widget.photos.length,
           itemBuilder: (BuildContext context, int index) {
             final PlacePhoto photo = widget.photos[index];
-            print('Image URL: ${_buildImageUrl(photo.url)}');
             return Image.network(
               _buildImageUrl(photo.url),
               fit: BoxFit.cover,

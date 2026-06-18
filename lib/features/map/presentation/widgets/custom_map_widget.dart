@@ -9,6 +9,7 @@ import 'package:loomah/features/map/data/models/nearby_places_request_model.dart
 import 'package:loomah/features/map/data/models/place_collection.dart';
 import 'package:loomah/features/map/data/providers/nearby_places_provider.dart';
 import 'package:loomah/features/map/domain/models/place_mini_card_info.dart';
+import 'package:loomah/features/map/presentation/pages/place_details_page.dart';
 import 'package:loomah/features/map/presentation/widgets/place_mini_card_info_widget.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -353,9 +354,7 @@ class _CustomMapWidgetState extends ConsumerState<CustomMapWidget> {
     final double topInset = MediaQuery.viewPaddingOf(context).top;
     final double topMargin = topInset + 10;
 
-    await _mapboxMap!.scaleBar.updateSettings(
-      ScaleBarSettings(enabled: false),
-    );
+    await _mapboxMap!.scaleBar.updateSettings(ScaleBarSettings(enabled: false));
 
     await _mapboxMap!.logo.updateSettings(
       LogoSettings(
@@ -409,7 +408,11 @@ class _CustomMapWidgetState extends ConsumerState<CustomMapWidget> {
                 });
               },
               onSeeDetails: () {
-                unawaited(context.push('/places/${_selectedPlaceInfo!.id}'));
+                unawaited(
+                  context.push(
+                    PlaceDetailsPage.location(_selectedPlaceInfo!.id),
+                  ),
+                );
               },
             ),
           ),
