@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:loomah/env/env.dart';
 import 'package:loomah/features/map/data/models/place_photo.dart';
+import 'package:loomah/features/map/presentation/widgets/place_photo_url.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 /// A carousel widget to display a list of [PlacePhoto]
@@ -17,16 +17,6 @@ class ImageCarousel extends StatefulWidget {
 
 class _ImageCarouselState extends State<ImageCarousel> {
   final PageController _controller = PageController();
-
-  String _buildImageUrl(String path) {
-    if (path.startsWith('http')) {
-      return path;
-    }
-    final Uri apiUri = Uri.parse(Env.apiBaseUrl);
-    final String origin = apiUri.origin;
-    final String cleanPath = path.startsWith('/') ? path : '/$path';
-    return '$origin$cleanPath';
-  }
 
   @override
   void dispose() {
@@ -53,7 +43,7 @@ class _ImageCarouselState extends State<ImageCarousel> {
           itemBuilder: (BuildContext context, int index) {
             final PlacePhoto photo = widget.photos[index];
             return Image.network(
-              _buildImageUrl(photo.url),
+              placePhotoUrl(photo.url),
               fit: BoxFit.cover,
               errorBuilder:
                   (BuildContext context, Object error, StackTrace? stackTrace) {

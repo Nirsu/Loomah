@@ -9,7 +9,7 @@ import 'package:loomah/features/favorite/data/providers/favorites_provider.dart'
 import 'package:loomah/features/map/data/models/place_details.dart';
 import 'package:loomah/features/map/data/models/place_photo.dart';
 import 'package:loomah/features/map/presentation/pages/place_details_page.dart';
-import 'package:loomah/features/map/presentation/widgets/image_carousel.dart';
+import 'package:loomah/features/map/presentation/widgets/place_photo_url.dart';
 import 'package:loomah/theme/loomah_theme.dart';
 
 /// A page that displays the user's favorite places.
@@ -142,7 +142,24 @@ class _FavoriteCard extends ConsumerWidget {
                           color: palette.accentSecondary,
                         ),
                       )
-                    : ImageCarousel(photos: photos),
+                    : Image.network(
+                        placePhotoUrl(photos.first.url),
+                        fit: BoxFit.cover,
+                        errorBuilder:
+                            (
+                              BuildContext context,
+                              Object error,
+                              StackTrace? stackTrace,
+                            ) {
+                              return ColoredBox(
+                                color: palette.accentLight,
+                                child: Icon(
+                                  LucideIcons.image_off,
+                                  color: palette.accentSecondary,
+                                ),
+                              );
+                            },
+                      ),
               ),
             ),
             const SizedBox(width: 14),
