@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loomah/features/favorite/data/models/favorite_item.dart';
 import 'package:loomah/features/favorite/data/providers/favorites_provider.dart';
+import 'package:loomah/features/home/presentation/widgets/floating_bottom_nav_metrics.dart';
 import 'package:loomah/features/map/data/models/place_details.dart';
 import 'package:loomah/features/map/data/models/place_photo.dart';
 import 'package:loomah/features/map/presentation/pages/place_details_page.dart';
@@ -27,6 +28,7 @@ class FavoritesPage extends ConsumerWidget {
     );
     final LoomahPalette palette = context.loomahPalette;
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final double bottomClearance = FloatingBottomNavMetrics.clearance(context);
 
     return SafeArea(
       child: RefreshIndicator(
@@ -38,7 +40,7 @@ class FavoritesPage extends ConsumerWidget {
             }
 
             return ListView.separated(
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 112),
+              padding: EdgeInsets.fromLTRB(20, 24, 20, bottomClearance),
               itemCount: items.length + 1,
               separatorBuilder: (BuildContext context, int index) =>
                   const SizedBox(height: 14),
@@ -52,7 +54,7 @@ class FavoritesPage extends ConsumerWidget {
             );
           },
           loading: () => ListView(
-            padding: const EdgeInsets.only(top: 180),
+            padding: EdgeInsets.fromLTRB(28, 180, 28, bottomClearance),
             children: <Widget>[
               Center(
                 child: CircularProgressIndicator(color: palette.accentPrimary),
@@ -226,13 +228,15 @@ class _EmptyFavorites extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double bottomClearance = FloatingBottomNavMetrics.clearance(context);
+
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         return ListView(
-          padding: const EdgeInsets.fromLTRB(28, 0, 28, 112),
+          padding: EdgeInsets.fromLTRB(28, 0, 28, bottomClearance),
           children: <Widget>[
             SizedBox(
-              height: constraints.maxHeight - 112,
+              height: constraints.maxHeight - bottomClearance,
               child: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -279,9 +283,10 @@ class _FavoritesError extends StatelessWidget {
   Widget build(BuildContext context) {
     final LoomahPalette palette = context.loomahPalette;
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final double bottomClearance = FloatingBottomNavMetrics.clearance(context);
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(28, 120, 28, 112),
+      padding: EdgeInsets.fromLTRB(28, 120, 28, bottomClearance),
       children: <Widget>[
         Icon(LucideIcons.circle_alert, size: 44, color: palette.accentPrimary),
         const SizedBox(height: 18),

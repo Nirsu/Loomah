@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:loomah/features/favorite/presentation/pages/favorites_page.dart';
+import 'package:loomah/features/home/presentation/widgets/floating_bottom_nav_metrics.dart';
 import 'package:loomah/features/map/presentation/pages/map_page.dart';
 import 'package:loomah/features/profile/presentation/pages/profile_page.dart';
 import 'package:loomah/theme/loomah_theme.dart';
@@ -28,23 +29,27 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final double systemBottomPadding = MediaQuery.viewPaddingOf(context).bottom;
-
     return Scaffold(
       extendBody: true,
-      body: SafeArea(
-        top: false,
-        bottom: false,
-        child: Padding(
-          padding: EdgeInsets.only(bottom: systemBottomPadding),
-          child: IndexedStack(index: _currentIndex, children: _pages),
-        ),
-      ),
-      bottomNavigationBar: _LoomahBottomNavBar(
-        currentIndex: _currentIndex,
-        onDestinationSelected: (int index) {
-          setState(() => _currentIndex = index);
-        },
+      body: Stack(
+        children: <Widget>[
+          SafeArea(
+            top: false,
+            bottom: false,
+            child: IndexedStack(index: _currentIndex, children: _pages),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: _LoomahBottomNavBar(
+              currentIndex: _currentIndex,
+              onDestinationSelected: (int index) {
+                setState(() => _currentIndex = index);
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -72,7 +77,12 @@ class _LoomahBottomNavBar extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+        padding: const EdgeInsets.fromLTRB(
+          16,
+          FloatingBottomNavMetrics.outerTopPadding,
+          16,
+          FloatingBottomNavMetrics.outerBottomPadding,
+        ),
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -92,14 +102,16 @@ class _LoomahBottomNavBar extends StatelessWidget {
             ],
           ),
           child: Padding(
-            padding: const EdgeInsets.all(6),
+            padding: const EdgeInsets.all(
+              FloatingBottomNavMetrics.innerPadding,
+            ),
             child: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
                 final double itemWidth =
                     constraints.maxWidth / _destinations.length;
 
                 return SizedBox(
-                  height: 56,
+                  height: FloatingBottomNavMetrics.itemHeight,
                   child: Stack(
                     children: <Widget>[
                       AnimatedPositioned(
@@ -108,7 +120,7 @@ class _LoomahBottomNavBar extends StatelessWidget {
                         left: itemWidth * currentIndex,
                         top: 0,
                         width: itemWidth,
-                        height: 56,
+                        height: FloatingBottomNavMetrics.itemHeight,
                         child: DecoratedBox(
                           decoration: BoxDecoration(
                             color: palette.accentLight,
@@ -183,7 +195,7 @@ class _LoomahNavItem extends StatelessWidget {
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: SizedBox(
-          height: 56,
+          height: FloatingBottomNavMetrics.itemHeight,
           child: TweenAnimationBuilder<Color?>(
             tween: ColorTween(end: foreground),
             duration: const Duration(milliseconds: 180),

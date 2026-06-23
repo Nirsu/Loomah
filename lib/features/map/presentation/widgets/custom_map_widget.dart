@@ -5,6 +5,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:loomah/features/home/presentation/widgets/floating_bottom_nav_metrics.dart';
 import 'package:loomah/features/map/data/models/nearby_places_request_model.dart';
 import 'package:loomah/features/map/data/models/place_collection.dart';
 import 'package:loomah/features/map/data/providers/nearby_places_provider.dart';
@@ -22,9 +23,6 @@ const double kMinDistanceToRefetch = 500;
 
 /// Minimum zoom level to fetch places (below this, icons are hidden anyway)
 const double kMinZoomToFetch = 12;
-
-/// Keeps the selected place card visually clear of the floating bottom nav.
-const double kMapPlaceCardBottomOffset = 112;
 
 /// A custom map widget that displays a Mapbox map.
 class CustomMapWidget extends ConsumerStatefulWidget {
@@ -399,7 +397,7 @@ class _CustomMapWidgetState extends ConsumerState<CustomMapWidget> {
           Positioned(
             left: 16,
             right: 16,
-            bottom: kMapPlaceCardBottomOffset,
+            bottom: FloatingBottomNavMetrics.clearance(context),
             child: PlaceMiniCardInfoWidget(
               info: _selectedPlaceInfo!,
               onClose: () {
