@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:loomah/features/map/data/models/place_details.dart';
 import 'package:loomah/features/map/presentation/widgets/place_badge.dart';
+import 'package:loomah/features/map/presentation/widgets/place_pricing_label.dart';
 import 'package:loomah/theme/loomah_theme.dart';
 
 /// Widget to display badges for a place.
@@ -9,6 +10,7 @@ class PlaceBadgesWrap extends StatelessWidget {
   const PlaceBadgesWrap({
     required this.type,
     required this.ageRanges,
+    required this.pricing,
     super.key,
   });
 
@@ -18,9 +20,13 @@ class PlaceBadgesWrap extends StatelessWidget {
   /// The age ranges of the place.
   final AgeRanges? ageRanges;
 
+  /// The pricing of the place.
+  final Pricing? pricing;
+
   @override
   Widget build(BuildContext context) {
     final LoomahPalette palette = Theme.of(context).extension<LoomahPalette>()!;
+    final String? pricingLabel = placePricingLabel(pricing);
     final List<Widget> children = <Widget>[
       PlaceBadge(
         text: type,
@@ -47,8 +53,8 @@ class PlaceBadgesWrap extends StatelessWidget {
           children.add(
             PlaceBadge(
               text: 'Bébé (0-1)',
-              bgColor: palette.pastelPink,
-              textColor: palette.accentPink,
+              bgColor: palette.pastelMint,
+              textColor: palette.accentGreen,
             ),
           );
         }
@@ -56,8 +62,8 @@ class PlaceBadgesWrap extends StatelessWidget {
           children.add(
             PlaceBadge(
               text: '0-3 ans',
-              bgColor: palette.pastelLavender,
-              textColor: palette.accentPrimary,
+              bgColor: palette.pastelMint,
+              textColor: palette.accentGreen,
             ),
           );
         }
@@ -65,8 +71,8 @@ class PlaceBadgesWrap extends StatelessWidget {
           children.add(
             PlaceBadge(
               text: '3-6 ans',
-              bgColor: palette.pastelViolet,
-              textColor: palette.accentSecondary,
+              bgColor: palette.pastelMint,
+              textColor: palette.accentGreen,
             ),
           );
         }
@@ -80,6 +86,16 @@ class PlaceBadgesWrap extends StatelessWidget {
           );
         }
       }
+    }
+
+    if (pricingLabel != null) {
+      children.add(
+        PlaceBadge(
+          text: pricingLabel,
+          bgColor: palette.pastelPrice,
+          textColor: palette.accentPrice,
+        ),
+      );
     }
 
     return Wrap(spacing: 8, runSpacing: 8, children: children);

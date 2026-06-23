@@ -20,11 +20,13 @@ class LoomahPalette extends ThemeExtension<LoomahPalette>
     required this.pastelCream,
     required this.pastelMint,
     required this.pastelPink,
+    required this.pastelPrice,
     required this.accentPrimary,
     required this.accentSecondary,
     required this.accentLight,
     required this.accentPink,
     required this.accentGreen,
+    required this.accentPrice,
     required this.glassBg,
     required this.glassBorder,
   });
@@ -52,6 +54,8 @@ class LoomahPalette extends ThemeExtension<LoomahPalette>
   @override
   final Color pastelPink;
   @override
+  final Color pastelPrice;
+  @override
   final Color accentPrimary;
   @override
   final Color accentSecondary;
@@ -61,6 +65,8 @@ class LoomahPalette extends ThemeExtension<LoomahPalette>
   final Color accentPink;
   @override
   final Color accentGreen;
+  @override
+  final Color accentPrice;
   @override
   final Color glassBg;
   @override
@@ -79,11 +85,13 @@ class LoomahPalette extends ThemeExtension<LoomahPalette>
     pastelCream: Color(0xFFFFFBEB),
     pastelMint: Color(0xFFECFDF5),
     pastelPink: Color(0xFFFDF2F8),
+    pastelPrice: Color(0xFFF5F3FF),
     accentPrimary: Color(0xFFF97316),
     accentSecondary: Color(0xFFEA580C),
     accentLight: Color(0xFFFFEDD5),
-    accentPink: Color(0xFFFB923C),
+    accentPink: Color(0xFFDB2777),
     accentGreen: Color(0xFF10B981),
+    accentPrice: Color(0xFF8B5CF6),
     glassBg: Color(0xB3FFFFFF),
     glassBorder: Color(0x33FFFFFF),
   );

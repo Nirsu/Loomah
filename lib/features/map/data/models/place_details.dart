@@ -56,6 +56,7 @@ enum PricingKind {
   paid,
 
   /// Mixed pricing.
+  @JsonValue('MIXED')
   mixed,
 
   /// Unknown pricing.

@@ -29,6 +29,7 @@ dependencies:
   smooth_page_indicator: ^2.0.1
   talker_dio_logger: ^5.1.5
   theme_tailor_annotation: ^3.1.1
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   build_runner: ^2.10.4

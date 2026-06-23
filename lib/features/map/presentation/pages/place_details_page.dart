@@ -8,10 +8,11 @@ import 'package:loomah/features/map/data/models/place_details.dart';
 import 'package:loomah/features/map/data/models/place_photo.dart';
 import 'package:loomah/features/map/data/providers/place_details_provider.dart';
 import 'package:loomah/features/map/presentation/widgets/image_carousel.dart';
+import 'package:loomah/features/map/presentation/widgets/place_actions_bar.dart';
 import 'package:loomah/features/map/presentation/widgets/place_badges_wrap.dart';
 import 'package:loomah/features/map/presentation/widgets/place_opening_hours.dart';
 import 'package:loomah/features/map/presentation/widgets/place_practical_info.dart';
-import 'package:loomah/features/map/presentation/widgets/place_pricing_info.dart';
+import 'package:loomah/features/map/presentation/widgets/place_quick_facts.dart';
 import 'package:loomah/theme/loomah_theme.dart';
 
 /// Page to display the details of a place.
@@ -47,86 +48,97 @@ class PlaceDetailsPage extends ConsumerWidget {
       backgroundColor: palette.background,
       body: placeDetailsAsync.when(
         data: (PlaceDetails place) {
-          return CustomScrollView(
-            slivers: <Widget>[
-              SliverAppBar(
-                expandedHeight: 250,
-                toolbarHeight: 112,
-                pinned: true,
-                automaticallyImplyLeading: false,
-                backgroundColor: Colors.transparent,
-                surfaceTintColor: Colors.transparent,
-                forceMaterialTransparency: true,
-                flexibleSpace: Stack(
-                  fit: StackFit.expand,
-                  children: <Widget>[
-                    ImageCarousel(photos: place.photos ?? const <PlacePhoto>[]),
-                    Positioned(
-                      top: MediaQuery.viewPaddingOf(context).top + 12,
-                      left: 4,
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.arrow_back_ios_new_rounded,
-                          color: palette.textDark,
+          return Stack(
+            children: <Widget>[
+              CustomScrollView(
+                slivers: <Widget>[
+                  SliverAppBar(
+                    expandedHeight: 250,
+                    toolbarHeight: 112,
+                    pinned: true,
+                    automaticallyImplyLeading: false,
+                    backgroundColor: Colors.transparent,
+                    surfaceTintColor: Colors.transparent,
+                    forceMaterialTransparency: true,
+                    flexibleSpace: Stack(
+                      fit: StackFit.expand,
+                      children: <Widget>[
+                        ImageCarousel(
+                          photos: place.photos ?? const <PlacePhoto>[],
                         ),
-                        style: _topButtonStyle(),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                    ),
-                    Positioned(
-                      top: MediaQuery.viewPaddingOf(context).top + 12,
-                      right: 8,
-                      child: _FavoriteActionButton(
-                        placeId: place.id,
-                        favorites: favoritesAsync,
-                        isBusy: favoriteAction.isLoading,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      PlaceBadgesWrap(
-                        type: place.type,
-                        ageRanges: place.ageRanges,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        place.name,
-                        style: textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: palette.textDark,
+                        Positioned(
+                          top: MediaQuery.viewPaddingOf(context).top + 12,
+                          left: 16,
+                          child: SizedBox.square(
+                            dimension: 48,
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.chevron_left_rounded,
+                                color: palette.textDark,
+                                size: 28,
+                              ),
+                              style: _topButtonStyle(),
+                              onPressed: () => Navigator.of(context).pop(),
+                            ),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 24),
-                      Text(
-                        place.description,
-                        style: textTheme.bodyLarge?.copyWith(
-                          height: 1.6,
-                          color: palette.textDark,
+                        Positioned(
+                          top: MediaQuery.viewPaddingOf(context).top + 12,
+                          right: 16,
+                          child: SizedBox.square(
+                            dimension: 48,
+                            child: _FavoriteActionButton(
+                              placeId: place.id,
+                              favorites: favoritesAsync,
+                              isBusy: favoriteAction.isLoading,
+                            ),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 32),
-                      if (place.pricing != null &&
-                          place.pricing!.kind !=
-                              PricingKind.unknown) ...<Widget>[
-                        PlacePricingInfo(pricing: place.pricing!),
-                        const SizedBox(height: 32),
                       ],
-                      PlacePracticalInfo(place: place),
-                      const SizedBox(height: 32),
-                      PlaceOpeningHours(openingHours: place.openingHours),
-                      SizedBox(
-                        height: 48 + MediaQuery.viewPaddingOf(context).bottom,
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 150),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          PlaceBadgesWrap(
+                            type: place.type,
+                            ageRanges: place.ageRanges,
+                            pricing: place.pricing,
+                          ),
+                          const SizedBox(height: 14),
+                          Text(
+                            place.name,
+                            style: textTheme.headlineMedium?.copyWith(
+                              fontWeight: FontWeight.w900,
+                              color: palette.textDark,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          PlaceQuickFacts(place: place),
+                          const SizedBox(height: 22),
+                          _DescriptionText(description: place.description),
+                          const SizedBox(height: 28),
+                          PlacePracticalInfo(place: place),
+                          const SizedBox(height: 28),
+                          PlaceOpeningHours(openingHours: place.openingHours),
+                          SizedBox(
+                            height:
+                                24 + MediaQuery.viewPaddingOf(context).bottom,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: PlaceActionsBar(place: place),
               ),
             ],
           );
@@ -142,6 +154,50 @@ class PlaceDetailsPage extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _DescriptionText extends StatefulWidget {
+  const _DescriptionText({required this.description});
+
+  final String description;
+
+  @override
+  State<_DescriptionText> createState() => _DescriptionTextState();
+}
+
+class _DescriptionTextState extends State<_DescriptionText> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final LoomahPalette palette = context.loomahPalette;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          widget.description,
+          maxLines: _expanded ? null : 4,
+          overflow: _expanded ? TextOverflow.visible : TextOverflow.ellipsis,
+          style: textTheme.bodyLarge?.copyWith(
+            height: 1.55,
+            color: palette.textDark,
+          ),
+        ),
+        if (widget.description.length > 180)
+          TextButton(
+            onPressed: () => setState(() => _expanded = !_expanded),
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+              foregroundColor: palette.accentSecondary,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: Text(_expanded ? 'Voir moins' : 'Lire plus'),
+          ),
+      ],
     );
   }
 }
