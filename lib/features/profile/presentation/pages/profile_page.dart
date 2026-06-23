@@ -2,40 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loomah/features/auth/application/auth_controller.dart';
+import 'package:loomah/features/auth/data/models/auth_session.dart';
 import 'package:loomah/features/home/presentation/widgets/floating_bottom_nav_metrics.dart';
 import 'package:loomah/theme/loomah_theme.dart';
 
 /// A page that displays and edits the user's profile.
-class ProfilePage extends ConsumerStatefulWidget {
+class ProfilePage extends ConsumerWidget {
   /// Creates a [ProfilePage].
   const ProfilePage({super.key});
 
   @override
-  ConsumerState<ProfilePage> createState() => _ProfilePageState();
-}
-
-class _ProfilePageState extends ConsumerState<ProfilePage> {
-  String? _name;
-  String? _email;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final AuthState auth = ref.watch(authControllerProvider);
-    final Map<String, dynamic>? user = auth.session?.user.data;
-    final String name = _name ?? _userName(user);
-    final String email = _email ?? _userEmail(user);
+    final AuthUser user = auth.session!.user;
     final double bottomClearance = FloatingBottomNavMetrics.clearance(context);
 
     return SafeArea(
       child: ListView(
-        padding: EdgeInsets.fromLTRB(
-          20,
-          24,
-          20,
-          bottomClearance,
-        ),
+        padding: EdgeInsets.fromLTRB(20, 24, 20, bottomClearance),
         children: <Widget>[
-          _ProfileHeader(name: name, email: email),
+          _ProfileHeader(name: user.username, email: user.email),
           const SizedBox(height: 28),
           _ProfileSection(
             title: 'Compte',
@@ -44,13 +30,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 icon: LucideIcons.user_round,
                 title: 'Informations personnelles',
                 subtitle: 'Nom, email',
-                onTap: () => _editProfile(name: name, email: email),
+                onTap: () => _editProfile(context: context, user: user),
               ),
               _ProfileRow(
                 icon: LucideIcons.lock_keyhole,
                 title: 'Mot de passe',
                 subtitle: 'Modifier ton mot de passe',
-                onTap: () => _showSoon('Changement de mot de passe à brancher'),
+                onTap: () =>
+                    _showSoon(context, 'Changement de mot de passe à brancher'),
               ),
             ],
           ),
@@ -62,8 +49,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 icon: LucideIcons.bell,
                 title: 'Notifications',
                 subtitle: 'Alertes et rappels',
-                onTap: () =>
-                    _showSoon('Préférences de notifications à brancher'),
+                onTap: () => _showSoon(
+                  context,
+                  'Préférences de notifications à brancher',
+                ),
               ),
             ],
           ),
@@ -74,12 +63,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               _ProfileRow(
                 icon: LucideIcons.file_text,
                 title: 'Conditions générales d’utilisation',
-                onTap: () => _showSoon('Lien CGU à brancher'),
+                onTap: () => _showSoon(context, 'Lien CGU à brancher'),
               ),
               _ProfileRow(
                 icon: LucideIcons.shield_check,
                 title: 'Politique de confidentialité',
-                onTap: () => _showSoon('Lien confidentialité à brancher'),
+                onTap: () =>
+                    _showSoon(context, 'Lien confidentialité à brancher'),
               ),
             ],
           ),
@@ -97,7 +87,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 icon: LucideIcons.trash_2,
                 title: 'Supprimer mon compte',
                 tint: context.loomahPalette.accentSecondary,
-                onTap: _confirmDeleteAccount,
+                onTap: () => _confirmDeleteAccount(context),
               ),
             ],
           ),
@@ -107,37 +97,35 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   }
 
   Future<void> _editProfile({
-    required String name,
-    required String email,
+    required BuildContext context,
+    required AuthUser user,
   }) async {
-    final _ProfileEditResult? result = await Navigator.of(context)
-        .push<_ProfileEditResult>(
-          MaterialPageRoute<_ProfileEditResult>(
-            builder: (BuildContext context) =>
-                _EditProfilePage(initialName: name, initialEmail: email),
-          ),
-        );
+    final bool? saved = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (BuildContext context) => _EditProfilePage(
+          initialName: user.username,
+          initialEmail: user.email,
+        ),
+      ),
+    );
 
-    if (result == null || !mounted) return;
-    setState(() {
-      _name = result.name;
-      _email = result.email;
-    });
-    _showSoon('UI enregistrée localement, API profil à brancher');
+    if (saved == true && context.mounted) {
+      _showSoon(context, 'API profil à brancher');
+    }
   }
 
-  Future<void> _confirmDeleteAccount() async {
+  Future<void> _confirmDeleteAccount(BuildContext context) async {
     final bool? confirmed = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) => const _DeleteAccountDialog(),
     );
 
-    if (confirmed == true && mounted) {
-      _showSoon('Suppression de compte à brancher');
+    if (confirmed == true && context.mounted) {
+      _showSoon(context, 'Suppression de compte à brancher');
     }
   }
 
-  void _showSoon(String message) {
+  void _showSoon(BuildContext context, String message) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text(message)));
@@ -232,8 +220,11 @@ class _ProfileSection extends StatelessWidget {
             ),
             child: Column(
               children: <Widget>[
-                for (int index = 0; index < children.length; index++)
-                  ...<Widget>[
+                for (
+                  int index = 0;
+                  index < children.length;
+                  index++
+                ) ...<Widget>[
                   if (index > 0)
                     Divider(
                       height: 1,
@@ -388,12 +379,7 @@ class _EditProfilePageState extends State<_EditProfilePage> {
             const SizedBox(height: 20),
             FilledButton(
               onPressed: () {
-                Navigator.of(context).pop(
-                  _ProfileEditResult(
-                    name: _nameController.text.trim(),
-                    email: _emailController.text.trim(),
-                  ),
-                );
+                Navigator.of(context).pop(true);
               },
               child: const Text('Enregistrer'),
             ),
@@ -472,21 +458,6 @@ class _DeleteAccountDialog extends StatelessWidget {
       ),
     );
   }
-}
-
-class _ProfileEditResult {
-  const _ProfileEditResult({required this.name, required this.email});
-
-  final String name;
-  final String email;
-}
-
-String _userName(Map<String, dynamic>? user) {
-  return user?['username'] as String? ?? user?['email'] as String? ?? 'Profil';
-}
-
-String _userEmail(Map<String, dynamic>? user) {
-  return user?['email'] as String? ?? 'Email non renseigné';
 }
 
 String _initials(String name, String email) {

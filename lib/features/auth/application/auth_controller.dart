@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:loomah/api/api_provider.dart';
 import 'package:loomah/features/auth/data/auth_api.dart';
 import 'package:loomah/features/auth/data/auth_token_storage.dart';
+import 'package:loomah/features/auth/data/models/auth_session.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_controller.g.dart';

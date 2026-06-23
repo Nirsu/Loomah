@@ -1,25 +1,5 @@
 import 'package:dio/dio.dart';
-
-/// App user returned by the backend.
-class AuthUser {
-  /// Creates an [AuthUser].
-  const AuthUser(this.data);
-
-  /// Raw backend payload.
-  final Map<String, dynamic> data;
-}
-
-/// Authenticated user session.
-class AuthSession {
-  /// Creates an [AuthSession].
-  const AuthSession({required this.user, required this.token});
-
-  /// Current user.
-  final AuthUser user;
-
-  /// Bearer token.
-  final String token;
-}
+import 'package:loomah/features/auth/data/models/auth_session.dart';
 
 /// Auth API client.
 class AuthApi {
@@ -34,16 +14,17 @@ class AuthApi {
     required String email,
     required String password,
   }) async {
-    final Response<Object?> response = await _dio.post<Object?>(
-      '/auth/register',
-      data: <String, String>{
-        'username': username,
-        'email': email,
-        'password': password,
-      },
-    );
+    final Response<Map<String, dynamic>> response = await _dio
+        .post<Map<String, dynamic>>(
+          '/auth/register',
+          data: <String, String>{
+            'username': username,
+            'email': email,
+            'password': password,
+          },
+        );
 
-    return _sessionFrom(response.data);
+    return AuthSession.fromJson(response.data!);
   }
 
   /// Logs in with email and password.
@@ -51,21 +32,20 @@ class AuthApi {
     required String email,
     required String password,
   }) async {
-    final Response<Object?> response = await _dio.post<Object?>(
-      '/auth/login',
-      data: <String, String>{'email': email, 'password': password},
-    );
+    final Response<Map<String, dynamic>> response = await _dio
+        .post<Map<String, dynamic>>(
+          '/auth/login',
+          data: <String, String>{'email': email, 'password': password},
+        );
 
-    return _sessionFrom(response.data);
+    return AuthSession.fromJson(response.data!);
   }
 
   /// Loads the current user.
   Future<AuthUser> me() async {
-    final Response<Object?> response = await _dio.get<Object?>('/auth/me');
-    final Map<String, dynamic> data = _mapFrom(response.data);
-    final Object? user = data['user'];
-
-    return AuthUser(user is Map ? Map<String, dynamic>.from(user) : data);
+    final Response<Map<String, dynamic>> response = await _dio
+        .get<Map<String, dynamic>>('/auth/me');
+    return AuthUser.fromJson(response.data!);
   }
 
   /// Requests a reset code.
@@ -82,41 +62,16 @@ class AuthApi {
     required String code,
     required String password,
   }) async {
-    final Response<Object?> response = await _dio.post<Object?>(
-      '/auth/password/reset',
-      data: <String, String>{
-        'email': email,
-        'code': code,
-        'password': password,
-      },
-    );
+    final Response<Map<String, dynamic>> response = await _dio
+        .post<Map<String, dynamic>>(
+          '/auth/password/reset',
+          data: <String, String>{
+            'email': email,
+            'code': code,
+            'password': password,
+          },
+        );
 
-    return _sessionFrom(response.data);
-  }
-
-  AuthSession _sessionFrom(Object? raw) {
-    final Map<String, dynamic> data = _mapFrom(raw);
-    final Object? token = data['token'];
-    final Object? user = data['user'];
-
-    if (token is! String || user is! Map) {
-      throw const FormatException('Invalid auth response');
-    }
-
-    return AuthSession(
-      user: AuthUser(Map<String, dynamic>.from(user)),
-      token: token,
-    );
-  }
-
-  Map<String, dynamic> _mapFrom(Object? raw) {
-    if (raw is Map<String, dynamic>) {
-      return raw;
-    }
-    if (raw is Map) {
-      return Map<String, dynamic>.from(raw);
-    }
-
-    throw const FormatException('Invalid auth response');
+    return AuthSession.fromJson(response.data!);
   }
 }
