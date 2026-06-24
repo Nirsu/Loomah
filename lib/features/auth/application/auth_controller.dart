@@ -92,15 +92,15 @@ class AuthController extends _$AuthController {
     required String username,
     required String email,
     required String password,
-  }) {
-    return _run(
+  }) async {
+    await _run(
       () => _api.register(username: username, email: email, password: password),
     );
   }
 
   /// Logs in and persists the session token.
-  Future<void> login({required String email, required String password}) {
-    return _run(() => _api.login(email: email, password: password));
+  Future<void> login({required String email, required String password}) async {
+    await _run(() => _api.login(email: email, password: password));
   }
 
   /// Requests a reset password code.
@@ -121,10 +121,77 @@ class AuthController extends _$AuthController {
     required String email,
     required String code,
     required String password,
-  }) {
-    return _run(
+  }) async {
+    await _run(
       () => _api.resetPassword(email: email, code: code, password: password),
     );
+  }
+
+  /// Updates the current user's profile while keeping the current token.
+  Future<ProfileUpdateResult?> updateProfile({
+    String? username,
+    String? email,
+  }) async {
+    state = state._copyWith(isBusy: true);
+    try {
+      final ProfileUpdateResult result = await _api.updateProfile(
+        username: username,
+        email: email,
+      );
+      state = AuthState(
+        status: AuthStatus.authenticated,
+        session: state.session!.copyWith(user: result.user),
+      );
+      return result;
+    } on Object catch (error) {
+      state = state._copyWith(error: _messageFor(error), isBusy: false);
+      return null;
+    }
+  }
+
+  /// Confirms the current user's pending email.
+  Future<bool> confirmEmail(String code) async {
+    state = state._copyWith(isBusy: true);
+    try {
+      final AuthUser user = await _api.confirmEmail(code);
+      state = AuthState(
+        status: AuthStatus.authenticated,
+        session: state.session!.copyWith(user: user),
+      );
+      return true;
+    } on Object catch (error) {
+      state = state._copyWith(error: _messageFor(error), isBusy: false);
+      return false;
+    }
+  }
+
+  /// Changes the password and persists the replacement token.
+  Future<bool> changePassword({
+    required String currentPassword,
+    required String newPassword,
+    required String confirmNewPassword,
+  }) {
+    return _run(
+      () => _api.changePassword(
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+        confirmNewPassword: confirmNewPassword,
+      ),
+    );
+  }
+
+  /// Deletes the account, token and local session.
+  Future<bool> deleteAccount(String password) async {
+    state = state._copyWith(isBusy: true);
+    try {
+      await _api.deleteAccount(password);
+      await _storage.deleteToken();
+      state = const AuthState(status: AuthStatus.unauthenticated);
+      return true;
+    } on Object catch (error) {
+      state = state._copyWith(error: _messageFor(error), isBusy: false);
+      return false;
+    }
   }
 
   /// Clears the current session.
@@ -159,18 +226,27 @@ class AuthController extends _$AuthController {
     }
   }
 
-  Future<void> _run(Future<AuthSession> Function() action) async {
+  Future<bool> _run(Future<AuthSession> Function() action) async {
     state = state._copyWith(isBusy: true);
     try {
       final AuthSession session = await action();
       await _storage.writeToken(session.token);
       state = AuthState(status: AuthStatus.authenticated, session: session);
+      return true;
     } on Object catch (error) {
       state = state._copyWith(error: _messageFor(error), isBusy: false);
+      return false;
     }
   }
 
   String _messageFor(Object error) {
+    if (error case DioException(response: final Response<dynamic> response?)) {
+      final Object? data = response.data;
+      if (data is Map<String, dynamic> && data['error'] is String) {
+        return data['error'] as String;
+      }
+    }
+
     if (error is DioException && error.response?.statusCode == 401) {
       return 'Email ou mot de passe incorrect.';
     }
