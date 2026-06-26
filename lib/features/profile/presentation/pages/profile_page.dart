@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loomah/features/auth/application/auth_controller.dart';
 import 'package:loomah/features/auth/data/models/auth_session.dart';
 import 'package:loomah/features/home/presentation/widgets/floating_bottom_nav_metrics.dart';
+import 'package:loomah/i18n/strings.g.dart';
 import 'package:loomah/theme/loomah_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -13,11 +14,17 @@ class ProfilePage extends ConsumerWidget {
   /// Creates a [ProfilePage].
   const ProfilePage({super.key});
 
+  static final Uri _termsOfUseUrl = Uri.parse('https://loomah.fr/terms-of-use');
+  static final Uri _privacyPolicyUrl = Uri.parse(
+    'https://loomah.fr/privacy-policy',
+  );
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AuthState auth = ref.watch(authControllerProvider);
     final AuthUser user = auth.session!.user;
     final double bottomClearance = FloatingBottomNavMetrics.clearance(context);
+    final Translations$profile$fr profile = Translations.of(context).profile;
 
     return SafeArea(
       child: ListView(
@@ -26,65 +33,69 @@ class ProfilePage extends ConsumerWidget {
           _ProfileHeader(name: user.username, email: user.email),
           const SizedBox(height: 28),
           _ProfileSection(
-            title: 'Compte',
+            title: profile.sections.account,
             children: <Widget>[
               _ProfileRow(
                 icon: LucideIcons.user_round,
-                title: 'Informations personnelles',
-                subtitle: 'Nom, email',
+                title: profile.rows.personalInfo,
+                subtitle: profile.rows.personalInfoSubtitle,
                 onTap: () =>
                     _editProfile(context: context, ref: ref, user: user),
               ),
               _ProfileRow(
                 icon: LucideIcons.lock_keyhole,
-                title: 'Mot de passe',
-                subtitle: 'Modifier ton mot de passe',
+                title: profile.rows.password,
+                subtitle: profile.rows.passwordSubtitle,
                 onTap: () => _changePassword(context, ref),
               ),
             ],
           ),
           const SizedBox(height: 18),
           _ProfileSection(
-            title: 'Préférences',
+            title: profile.sections.preferences,
             children: <Widget>[
               _ProfileRow(
+                icon: LucideIcons.globe,
+                title: profile.rows.language,
+                subtitle: _languageName(profile, LocaleSettings.currentLocale),
+                onTap: () => _changeLanguage(context),
+              ),
+              _ProfileRow(
                 icon: LucideIcons.bell,
-                title: 'Notifications',
-                subtitle: 'Coming soon',
+                title: profile.rows.notifications,
+                subtitle: profile.rows.notificationsSubtitle,
               ),
             ],
           ),
           const SizedBox(height: 18),
           _ProfileSection(
-            title: 'Légal',
+            title: profile.sections.legal,
             children: <Widget>[
               _ProfileRow(
                 icon: LucideIcons.file_text,
-                title: 'Conditions générales d’utilisation',
-                onTap: () =>
-                    _openLegalUrl(context, 'https://loomah.fr/terms-of-use'),
+                title: profile.rows.terms,
+                onTap: () => _openLegalUrl(context, _termsOfUseUrl),
               ),
               _ProfileRow(
                 icon: LucideIcons.shield_check,
-                title: 'Politique de confidentialité',
-                onTap: () =>
-                    _openLegalUrl(context, 'https://loomah.fr/privacy-policy'),
+                title: profile.rows.privacy,
+                onTap: () => _openLegalUrl(context, _privacyPolicyUrl),
               ),
             ],
           ),
           const SizedBox(height: 18),
           _ProfileSection(
-            title: 'Session',
+            title: profile.sections.session,
             children: <Widget>[
               _ProfileRow(
                 icon: LucideIcons.log_out,
-                title: 'Se déconnecter',
+                title: profile.rows.logout,
                 tint: context.loomahPalette.accentSecondary,
                 onTap: () => ref.read(authControllerProvider.notifier).logout(),
               ),
               _ProfileRow(
                 icon: LucideIcons.trash_2,
-                title: 'Supprimer mon compte',
+                title: profile.rows.deleteAccount,
                 tint: context.loomahPalette.accentSecondary,
                 onTap: () => _confirmDeleteAccount(context, ref),
               ),
@@ -111,7 +122,10 @@ class ProfilePage extends ConsumerWidget {
     );
 
     if (saved == true && context.mounted) {
-      _showSoon(context, 'Profil mis à jour.');
+      _showSoon(
+        context,
+        Translations.of(context).profile.snackbars.profileUpdated,
+      );
     }
   }
 
@@ -124,7 +138,10 @@ class ProfilePage extends ConsumerWidget {
     );
 
     if (changed == true && context.mounted) {
-      _showSoon(context, 'Mot de passe modifié.');
+      _showSoon(
+        context,
+        Translations.of(context).profile.snackbars.passwordChanged,
+      );
     }
   }
 
@@ -139,26 +156,100 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 
+  Future<void> _changeLanguage(BuildContext context) async {
+    final Translations$profile$fr profile = Translations.of(context).profile;
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.white,
+      showDragHandle: true,
+      builder: (BuildContext context) {
+        final AppLocale currentLocale = LocaleSettings.currentLocale;
+
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    profile.language.title,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+              ),
+              _LanguageTile(
+                title: profile.language.french,
+                locale: AppLocale.fr,
+                currentLocale: currentLocale,
+              ),
+              _LanguageTile(
+                title: profile.language.english,
+                locale: AppLocale.en,
+                currentLocale: currentLocale,
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void _showSoon(BuildContext context, String message) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text(message)));
   }
 
-  Future<void> _openLegalUrl(BuildContext context, String value) async {
+  Future<void> _openLegalUrl(BuildContext context, Uri uri) async {
     bool opened = false;
     try {
-      opened = await launchUrl(
-        Uri.parse(value),
-        mode: LaunchMode.externalApplication,
-      );
+      opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
     } on Exception {
       // Keep the same visible fallback when the platform cannot open the URL.
     }
 
     if (!opened && context.mounted) {
-      _showSoon(context, 'Impossible d’ouvrir le lien.');
+      _showSoon(
+        context,
+        Translations.of(context).profile.snackbars.legalOpenFailed,
+      );
     }
+  }
+}
+
+class _LanguageTile extends StatelessWidget {
+  const _LanguageTile({
+    required this.title,
+    required this.locale,
+    required this.currentLocale,
+  });
+
+  final String title;
+  final AppLocale locale;
+  final AppLocale currentLocale;
+
+  @override
+  Widget build(BuildContext context) {
+    final LoomahPalette palette = context.loomahPalette;
+    final bool selected = locale == currentLocale;
+
+    return ListTile(
+      title: Text(title),
+      trailing: selected
+          ? Icon(LucideIcons.check, color: palette.accentPrimary)
+          : null,
+      onTap: () async {
+        await LocaleSettings.setLocale(locale);
+        if (context.mounted) {
+          Navigator.of(context).pop();
+        }
+      },
+    );
   }
 }
 
@@ -379,13 +470,12 @@ class _EditProfilePageState extends ConsumerState<_EditProfilePage> {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final AuthState auth = ref.watch(authControllerProvider);
     final bool isConfirmingEmail = _pendingEmail != null;
+    final Translations$profile$fr profile = Translations.of(context).profile;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          isConfirmingEmail
-              ? 'Confirmer le nouvel email'
-              : 'Informations personnelles',
+          isConfirmingEmail ? profile.edit.confirmTitle : profile.edit.title,
         ),
       ),
       body: SafeArea(
@@ -396,9 +486,8 @@ class _EditProfilePageState extends ConsumerState<_EditProfilePage> {
             children: <Widget>[
               Text(
                 isConfirmingEmail
-                    ? 'Un code à 6 chiffres a été envoyé à $_pendingEmail. '
-                          'Il expire après 10 minutes et 5 essais.'
-                    : 'Ces informations seront utilisées pour personnaliser ton compte.',
+                    ? profile.edit.confirmSubtitle(pendingEmail: _pendingEmail!)
+                    : profile.edit.subtitle,
                 style: textTheme.bodyMedium?.copyWith(color: palette.textLight),
               ),
               const SizedBox(height: 18),
@@ -423,9 +512,9 @@ class _EditProfilePageState extends ConsumerState<_EditProfilePage> {
                           ],
                           validator: (String? value) => value?.length == 6
                               ? null
-                              : 'Saisis le code à 6 chiffres.',
-                          decoration: const InputDecoration(
-                            labelText: 'Code de confirmation',
+                              : profile.edit.codeValidation,
+                          decoration: InputDecoration(
+                            labelText: profile.edit.codeLabel,
                           ),
                         )
                       : Column(
@@ -433,18 +522,24 @@ class _EditProfilePageState extends ConsumerState<_EditProfilePage> {
                             TextFormField(
                               controller: _nameController,
                               textInputAction: TextInputAction.next,
-                              validator: _required,
-                              decoration: const InputDecoration(
-                                labelText: 'Nom',
+                              validator: (String? value) =>
+                                  _required(value, profile.validation.required),
+                              decoration: InputDecoration(
+                                labelText: profile.edit.nameLabel,
                               ),
                             ),
                             const SizedBox(height: 14),
                             TextFormField(
                               controller: _emailController,
                               keyboardType: TextInputType.emailAddress,
-                              validator: _emailValidator,
-                              decoration: const InputDecoration(
-                                labelText: 'Email',
+                              validator: (String? value) => _emailValidator(
+                                value,
+                                requiredMessage: profile.validation.required,
+                                invalidEmailMessage:
+                                    profile.validation.invalidEmail,
+                              ),
+                              decoration: InputDecoration(
+                                labelText: profile.edit.emailLabel,
                               ),
                             ),
                           ],
@@ -472,7 +567,11 @@ class _EditProfilePageState extends ConsumerState<_EditProfilePage> {
                           color: Colors.white,
                         ),
                       )
-                    : Text(isConfirmingEmail ? 'Confirmer' : 'Enregistrer'),
+                    : Text(
+                        isConfirmingEmail
+                            ? profile.edit.confirmButton
+                            : profile.edit.saveButton,
+                      ),
               ),
             ],
           ),
@@ -549,9 +648,10 @@ class _ChangePasswordPageState extends ConsumerState<_ChangePasswordPage> {
   Widget build(BuildContext context) {
     final AuthState auth = ref.watch(authControllerProvider);
     final LoomahPalette palette = context.loomahPalette;
+    final Translations$profile$fr profile = Translations.of(context).profile;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Modifier le mot de passe')),
+      appBar: AppBar(title: Text(profile.password.title)),
       body: SafeArea(
         child: Form(
           key: _formKey,
@@ -560,24 +660,24 @@ class _ChangePasswordPageState extends ConsumerState<_ChangePasswordPage> {
             children: <Widget>[
               _ProfilePasswordField(
                 controller: _currentController,
-                label: 'Mot de passe actuel',
+                label: profile.password.currentLabel,
               ),
               const SizedBox(height: 14),
               _ProfilePasswordField(
                 controller: _newController,
-                label: 'Nouveau mot de passe',
+                label: profile.password.newLabel,
               ),
               const SizedBox(height: 14),
               _ProfilePasswordField(
                 controller: _confirmController,
-                label: 'Confirmer le nouveau mot de passe',
+                label: profile.password.confirmLabel,
                 validator: (String? value) {
                   if (value == null || value.isEmpty) {
-                    return 'Ce champ est requis.';
+                    return profile.validation.required;
                   }
                   return value == _newController.text
                       ? null
-                      : 'Les mots de passe ne correspondent pas.';
+                      : profile.validation.passwordMismatch;
                 },
               ),
               if (auth.error case final String error) ...<Widget>[
@@ -601,7 +701,7 @@ class _ChangePasswordPageState extends ConsumerState<_ChangePasswordPage> {
                           color: Colors.white,
                         ),
                       )
-                    : const Text('Modifier le mot de passe'),
+                    : Text(profile.password.submitButton),
               ),
             ],
           ),
@@ -631,19 +731,23 @@ class _ProfilePasswordField extends StatelessWidget {
   const _ProfilePasswordField({
     required this.controller,
     required this.label,
-    this.validator = _required,
+    this.validator,
   });
 
   final TextEditingController controller;
   final String label;
-  final FormFieldValidator<String> validator;
+  final FormFieldValidator<String>? validator;
 
   @override
   Widget build(BuildContext context) {
+    final Translations$profile$fr profile = Translations.of(context).profile;
+
     return TextFormField(
       controller: controller,
       obscureText: true,
-      validator: validator,
+      validator:
+          validator ??
+          (String? value) => _required(value, profile.validation.required),
       decoration: InputDecoration(labelText: label),
     );
   }
@@ -672,6 +776,7 @@ class _DeleteAccountDialogState extends ConsumerState<_DeleteAccountDialog> {
     final LoomahPalette palette = context.loomahPalette;
     final TextTheme textTheme = Theme.of(context).textTheme;
     final AuthState auth = ref.watch(authControllerProvider);
+    final Translations$profile$fr profile = Translations.of(context).profile;
 
     return Dialog(
       backgroundColor: Colors.white,
@@ -693,7 +798,7 @@ class _DeleteAccountDialogState extends ConsumerState<_DeleteAccountDialog> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Supprimer le compte ?',
+                profile.deleteAccount.title,
                 textAlign: TextAlign.center,
                 style: textTheme.titleLarge?.copyWith(
                   color: palette.textDark,
@@ -702,14 +807,14 @@ class _DeleteAccountDialogState extends ConsumerState<_DeleteAccountDialog> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Ton profil, tes favoris et tes préférences seront supprimés définitivement.',
+                profile.deleteAccount.body,
                 textAlign: TextAlign.center,
                 style: textTheme.bodyMedium?.copyWith(color: palette.textLight),
               ),
               const SizedBox(height: 16),
               _ProfilePasswordField(
                 controller: _passwordController,
-                label: 'Mot de passe actuel',
+                label: profile.password.currentLabel,
               ),
               if (auth.error case final String error) ...<Widget>[
                 const SizedBox(height: 10),
@@ -740,7 +845,7 @@ class _DeleteAccountDialogState extends ConsumerState<_DeleteAccountDialog> {
                                 color: Colors.white,
                               ),
                             )
-                          : const Text('Supprimer mon compte'),
+                          : Text(profile.deleteAccount.submitButton),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -754,7 +859,7 @@ class _DeleteAccountDialogState extends ConsumerState<_DeleteAccountDialog> {
                         backgroundColor: palette.accentLight,
                         foregroundColor: palette.accentSecondary,
                       ),
-                      child: const Text('Annuler'),
+                      child: Text(profile.deleteAccount.cancelButton),
                     ),
                   ),
                 ],
@@ -795,14 +900,25 @@ String _initials(String name, String email) {
       .toUpperCase();
 }
 
-String? _required(String? value) {
-  return value == null || value.trim().isEmpty ? 'Ce champ est requis.' : null;
+String _languageName(Translations$profile$fr profile, AppLocale locale) {
+  return switch (locale) {
+    AppLocale.fr => profile.language.french,
+    AppLocale.en => profile.language.english,
+  };
 }
 
-String? _emailValidator(String? value) {
+String? _required(String? value, String message) {
+  return value == null || value.trim().isEmpty ? message : null;
+}
+
+String? _emailValidator(
+  String? value, {
+  required String requiredMessage,
+  required String invalidEmailMessage,
+}) {
   final String email = value?.trim() ?? '';
   if (email.isEmpty) {
-    return 'Ce champ est requis.';
+    return requiredMessage;
   }
-  return email.contains('@') ? null : 'Saisis un email valide.';
+  return email.contains('@') ? null : invalidEmailMessage;
 }

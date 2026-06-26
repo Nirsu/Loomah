@@ -1,0 +1,61 @@
+{
+  "sections": {
+    "account": "Compte",
+    "preferences": "Préférences",
+    "legal": "Légal",
+    "session": "Session"
+  },
+  "rows": {
+    "personalInfo": "Informations personnelles",
+    "personalInfoSubtitle": "Nom, email",
+    "password": "Mot de passe",
+    "passwordSubtitle": "Modifier ton mot de passe",
+    "language": "Langue",
+    "notifications": "Notifications",
+    "notificationsSubtitle": "Bientôt disponible",
+    "terms": "Conditions générales d'utilisation",
+    "privacy": "Politique de confidentialité",
+    "logout": "Se déconnecter",
+    "deleteAccount": "Supprimer mon compte"
+  },
+  "language": {
+    "title": "Langue",
+    "french": "Français",
+    "english": "English"
+  },
+  "snackbars": {
+    "profileUpdated": "Profil mis à jour.",
+    "passwordChanged": "Mot de passe modifié.",
+    "legalOpenFailed": "Impossible d'ouvrir le lien."
+  },
+  "edit": {
+    "title": "Informations personnelles",
+    "confirmTitle": "Confirmer le nouvel email",
+    "subtitle": "Ces informations seront utilisées pour personnaliser ton compte.",
+    "confirmSubtitle": "Un code à 6 chiffres a été envoyé à $pendingEmail. Il expire après 10 minutes et 5 essais.",
+    "codeValidation": "Saisis le code à 6 chiffres.",
+    "codeLabel": "Code de confirmation",
+    "nameLabel": "Nom",
+    "emailLabel": "Email",
+    "confirmButton": "Confirmer",
+    "saveButton": "Enregistrer"
+  },
+  "password": {
+    "title": "Modifier le mot de passe",
+    "currentLabel": "Mot de passe actuel",
+    "newLabel": "Nouveau mot de passe",
+    "confirmLabel": "Confirmer le nouveau mot de passe",
+    "submitButton": "Modifier le mot de passe"
+  },
+  "deleteAccount": {
+    "title": "Supprimer le compte ?",
+    "body": "Ton profil, tes favoris et tes préférences seront supprimés définitivement.",
+    "submitButton": "Supprimer mon compte",
+    "cancelButton": "Annuler"
+  },
+  "validation": {
+    "required": "Ce champ est requis.",
+    "passwordMismatch": "Les mots de passe ne correspondent pas.",
+    "invalidEmail": "Saisis un email valide."
+  }
+}

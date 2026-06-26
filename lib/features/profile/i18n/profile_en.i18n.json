@@ -1,0 +1,61 @@
+{
+  "sections": {
+    "account": "Account",
+    "preferences": "Preferences",
+    "legal": "Legal",
+    "session": "Session"
+  },
+  "rows": {
+    "personalInfo": "Personal information",
+    "personalInfoSubtitle": "Name, email",
+    "password": "Password",
+    "passwordSubtitle": "Change your password",
+    "language": "Language",
+    "notifications": "Notifications",
+    "notificationsSubtitle": "Coming soon",
+    "terms": "Terms of use",
+    "privacy": "Privacy policy",
+    "logout": "Log out",
+    "deleteAccount": "Delete my account"
+  },
+  "language": {
+    "title": "Language",
+    "french": "Français",
+    "english": "English"
+  },
+  "snackbars": {
+    "profileUpdated": "Profile updated.",
+    "passwordChanged": "Password changed.",
+    "legalOpenFailed": "Unable to open the link."
+  },
+  "edit": {
+    "title": "Personal information",
+    "confirmTitle": "Confirm the new email",
+    "subtitle": "This information will be used to personalize your account.",
+    "confirmSubtitle": "A 6-digit code was sent to $pendingEmail. It expires after 10 minutes and 5 attempts.",
+    "codeValidation": "Enter the 6-digit code.",
+    "codeLabel": "Confirmation code",
+    "nameLabel": "Name",
+    "emailLabel": "Email",
+    "confirmButton": "Confirm",
+    "saveButton": "Save"
+  },
+  "password": {
+    "title": "Change password",
+    "currentLabel": "Current password",
+    "newLabel": "New password",
+    "confirmLabel": "Confirm new password",
+    "submitButton": "Change password"
+  },
+  "deleteAccount": {
+    "title": "Delete account?",
+    "body": "Your profile, favorites, and preferences will be permanently deleted.",
+    "submitButton": "Delete my account",
+    "cancelButton": "Cancel"
+  },
+  "validation": {
+    "required": "This field is required.",
+    "passwordMismatch": "Passwords do not match.",
+    "invalidEmail": "Enter a valid email."
+  }
+}
