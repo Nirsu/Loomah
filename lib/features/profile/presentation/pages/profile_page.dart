@@ -6,6 +6,7 @@ import 'package:loomah/features/auth/application/auth_controller.dart';
 import 'package:loomah/features/auth/data/models/auth_session.dart';
 import 'package:loomah/features/home/presentation/widgets/floating_bottom_nav_metrics.dart';
 import 'package:loomah/theme/loomah_theme.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// A page that displays and edits the user's profile.
 class ProfilePage extends ConsumerWidget {
@@ -49,11 +50,7 @@ class ProfilePage extends ConsumerWidget {
               _ProfileRow(
                 icon: LucideIcons.bell,
                 title: 'Notifications',
-                subtitle: 'Alertes et rappels',
-                onTap: () => _showSoon(
-                  context,
-                  'Préférences de notifications à brancher',
-                ),
+                subtitle: 'Coming soon',
               ),
             ],
           ),
@@ -64,13 +61,14 @@ class ProfilePage extends ConsumerWidget {
               _ProfileRow(
                 icon: LucideIcons.file_text,
                 title: 'Conditions générales d’utilisation',
-                onTap: () => _showSoon(context, 'Lien CGU à brancher'),
+                onTap: () =>
+                    _openLegalUrl(context, 'https://loomah.fr/terms-of-use'),
               ),
               _ProfileRow(
                 icon: LucideIcons.shield_check,
                 title: 'Politique de confidentialité',
                 onTap: () =>
-                    _showSoon(context, 'Lien confidentialité à brancher'),
+                    _openLegalUrl(context, 'https://loomah.fr/privacy-policy'),
               ),
             ],
           ),
@@ -145,6 +143,22 @@ class ProfilePage extends ConsumerWidget {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<void> _openLegalUrl(BuildContext context, String value) async {
+    bool opened = false;
+    try {
+      opened = await launchUrl(
+        Uri.parse(value),
+        mode: LaunchMode.externalApplication,
+      );
+    } on Exception {
+      // Keep the same visible fallback when the platform cannot open the URL.
+    }
+
+    if (!opened && context.mounted) {
+      _showSoon(context, 'Impossible d’ouvrir le lien.');
+    }
   }
 }
 
@@ -277,7 +291,8 @@ class _ProfileRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final LoomahPalette palette = context.loomahPalette;
     final TextTheme textTheme = Theme.of(context).textTheme;
-    final Color color = tint ?? palette.textDark;
+    final bool enabled = onTap != null;
+    final Color color = enabled ? tint ?? palette.textDark : palette.textLight;
 
     return InkWell(
       onTap: onTap,
@@ -310,7 +325,12 @@ class _ProfileRow extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(LucideIcons.chevron_right, size: 20, color: palette.textLight),
+            if (enabled)
+              Icon(
+                LucideIcons.chevron_right,
+                size: 20,
+                color: palette.textLight,
+              ),
           ],
         ),
       ),

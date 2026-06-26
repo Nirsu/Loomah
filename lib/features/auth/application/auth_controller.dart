@@ -138,10 +138,7 @@ class AuthController extends _$AuthController {
         username: username,
         email: email,
       );
-      state = AuthState(
-        status: AuthStatus.authenticated,
-        session: state.session!.copyWith(user: result.user),
-      );
+      await _setSession(state.session!.copyWith(user: result.user));
       return result;
     } on Object catch (error) {
       state = state._copyWith(error: _messageFor(error), isBusy: false);
@@ -154,10 +151,7 @@ class AuthController extends _$AuthController {
     state = state._copyWith(isBusy: true);
     try {
       final AuthUser user = await _api.confirmEmail(code);
-      state = AuthState(
-        status: AuthStatus.authenticated,
-        session: state.session!.copyWith(user: user),
-      );
+      await _setSession(state.session!.copyWith(user: user));
       return true;
     } on Object catch (error) {
       state = state._copyWith(error: _messageFor(error), isBusy: false);
@@ -185,7 +179,7 @@ class AuthController extends _$AuthController {
     state = state._copyWith(isBusy: true);
     try {
       await _api.deleteAccount(password);
-      await _storage.deleteToken();
+      await _storage.deleteSession();
       state = const AuthState(status: AuthStatus.unauthenticated);
       return true;
     } on Object catch (error) {
@@ -196,7 +190,7 @@ class AuthController extends _$AuthController {
 
   /// Clears the current session.
   Future<void> logout() async {
-    await _storage.deleteToken();
+    await _storage.deleteSession();
     state = const AuthState(status: AuthStatus.unauthenticated);
   }
 
@@ -208,6 +202,24 @@ class AuthController extends _$AuthController {
   }
 
   Future<void> _restore() async {
+    final AuthSession? savedSession = await _storage.readSession();
+    if (savedSession != null) {
+      state = AuthState(
+        status: AuthStatus.authenticated,
+        session: savedSession,
+      );
+
+      try {
+        final AuthUser user = await _api.me();
+        await _setSession(savedSession.copyWith(user: user));
+      } on Object catch (error) {
+        if (_isRejectedSession(error)) {
+          await _clearSession();
+        }
+      }
+      return;
+    }
+
     final String? token = await _storage.readToken();
     if (token == null || token.isEmpty) {
       state = const AuthState(status: AuthStatus.unauthenticated);
@@ -216,13 +228,13 @@ class AuthController extends _$AuthController {
 
     try {
       final AuthUser user = await _api.me();
-      state = AuthState(
-        status: AuthStatus.authenticated,
-        session: AuthSession(user: user, token: token),
-      );
-    } on Object {
-      await _storage.deleteToken();
-      state = const AuthState(status: AuthStatus.unauthenticated);
+      await _setSession(AuthSession(user: user, token: token));
+    } on Object catch (error) {
+      if (_isRejectedSession(error)) {
+        await _clearSession();
+      } else {
+        state = const AuthState(status: AuthStatus.unauthenticated);
+      }
     }
   }
 
@@ -230,13 +242,30 @@ class AuthController extends _$AuthController {
     state = state._copyWith(isBusy: true);
     try {
       final AuthSession session = await action();
-      await _storage.writeToken(session.token);
-      state = AuthState(status: AuthStatus.authenticated, session: session);
+      await _setSession(session);
       return true;
     } on Object catch (error) {
       state = state._copyWith(error: _messageFor(error), isBusy: false);
       return false;
     }
+  }
+
+  Future<void> _setSession(AuthSession session) async {
+    await _storage.writeSession(session);
+    state = AuthState(status: AuthStatus.authenticated, session: session);
+  }
+
+  Future<void> _clearSession() async {
+    await _storage.deleteSession();
+    state = const AuthState(status: AuthStatus.unauthenticated);
+  }
+
+  bool _isRejectedSession(Object error) {
+    if (error is! DioException) {
+      return false;
+    }
+    final int? statusCode = error.response?.statusCode;
+    return statusCode == 401 || statusCode == 403;
   }
 
   String _messageFor(Object error) {
