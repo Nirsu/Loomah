@@ -11,6 +11,7 @@ import 'package:loomah/features/map/data/models/place_details.dart';
 import 'package:loomah/features/map/data/models/place_photo.dart';
 import 'package:loomah/features/map/presentation/pages/place_details_page.dart';
 import 'package:loomah/features/map/presentation/widgets/place_photo_url.dart';
+import 'package:loomah/i18n/strings.g.dart';
 import 'package:loomah/theme/loomah_theme.dart';
 
 /// A page that displays the user's favorite places.
@@ -78,12 +79,15 @@ class _FavoritesHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final LoomahPalette palette = context.loomahPalette;
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final Translations$favorite$fr favoriteText = Translations.of(
+      context,
+    ).favorite;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          'Favoris',
+          favoriteText.title,
           style: textTheme.headlineMedium?.copyWith(
             color: palette.textDark,
             fontWeight: FontWeight.w900,
@@ -91,7 +95,7 @@ class _FavoritesHeader extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          '$count lieu${count > 1 ? 'x' : ''} sauvegardé${count > 1 ? 's' : ''}',
+          favoriteText.savedPlaces(count: count),
           style: textTheme.bodyLarge?.copyWith(color: palette.textLight),
         ),
       ],
@@ -109,6 +113,9 @@ class _FavoriteCard extends ConsumerWidget {
     final PlaceDetails place = favorite.place;
     final LoomahPalette palette = context.loomahPalette;
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final Translations$favorite$fr favoriteText = Translations.of(
+      context,
+    ).favorite;
     final AsyncValue<void> mutation = ref.watch(favoriteControllerProvider);
     final List<PlacePhoto> photos = place.photos ?? <PlacePhoto>[];
 
@@ -190,7 +197,10 @@ class _FavoriteCard extends ConsumerWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    _addressText(place.address),
+                    _addressText(
+                      place.address,
+                      favoriteText.addressUnavailable,
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: textTheme.bodyMedium?.copyWith(
@@ -229,6 +239,9 @@ class _EmptyFavorites extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double bottomClearance = FloatingBottomNavMetrics.clearance(context);
+    final Translations$favorite$fr favoriteText = Translations.of(
+      context,
+    ).favorite;
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -248,7 +261,7 @@ class _EmptyFavorites extends StatelessWidget {
                     ),
                     const SizedBox(height: 18),
                     Text(
-                      'Aucun favori',
+                      favoriteText.emptyTitle,
                       textAlign: TextAlign.center,
                       style: textTheme.headlineMedium?.copyWith(
                         color: palette.textDark,
@@ -257,7 +270,7 @@ class _EmptyFavorites extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Ajoute des lieux depuis leur fiche pour les retrouver ici.',
+                      favoriteText.emptySubtitle,
                       textAlign: TextAlign.center,
                       style: textTheme.bodyLarge?.copyWith(
                         color: palette.textLight,
@@ -284,6 +297,9 @@ class _FavoritesError extends StatelessWidget {
     final LoomahPalette palette = context.loomahPalette;
     final TextTheme textTheme = Theme.of(context).textTheme;
     final double bottomClearance = FloatingBottomNavMetrics.clearance(context);
+    final Translations$favorite$fr favoriteText = Translations.of(
+      context,
+    ).favorite;
 
     return ListView(
       padding: EdgeInsets.fromLTRB(28, 120, 28, bottomClearance),
@@ -291,20 +307,20 @@ class _FavoritesError extends StatelessWidget {
         Icon(LucideIcons.circle_alert, size: 44, color: palette.accentPrimary),
         const SizedBox(height: 18),
         Text(
-          'Impossible de charger les favoris',
+          favoriteText.loadError,
           textAlign: TextAlign.center,
           style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
         ),
         const SizedBox(height: 18),
-        ElevatedButton(onPressed: onRetry, child: const Text('Réessayer')),
+        ElevatedButton(onPressed: onRetry, child: Text(favoriteText.retry)),
       ],
     );
   }
 }
 
-String _addressText(Address? address) {
+String _addressText(Address? address, String unavailableText) {
   if (address == null) {
-    return 'Adresse indisponible';
+    return unavailableText;
   }
 
   return <String>[

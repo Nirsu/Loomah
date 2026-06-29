@@ -1,0 +1,12 @@
+{
+  "title": "Favorites",
+  "savedPlaces(param=count)": {
+    "one": "1 saved place",
+    "other": "$count saved places"
+  },
+  "emptyTitle": "No favorites",
+  "emptySubtitle": "Add places from their page to find them here.",
+  "loadError": "Unable to load favorites",
+  "retry": "Try again",
+  "addressUnavailable": "Address unavailable"
+}

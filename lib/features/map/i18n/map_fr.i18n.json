@@ -1,0 +1,57 @@
+{
+  "actions": {
+    "openMaps": "Ouvrir dans Maps",
+    "website": "Site web",
+    "call": "Appeler"
+  },
+  "details": {
+    "error": "Une erreur est survenue",
+    "readMore": "Lire plus",
+    "readLess": "Voir moins",
+    "seeDetails": "Voir la fiche"
+  },
+  "practical": {
+    "title": "Infos pratiques",
+    "website": "Site web"
+  },
+  "opening": {
+    "title": "Horaires",
+    "closed": "FERMÉ",
+    "today": "Aujourd'hui",
+    "closedToday": "Fermé aujourd'hui",
+    "openToday": "Ouvert aujourd'hui $hours",
+    "days": {
+      "monday": "Lundi",
+      "tuesday": "Mardi",
+      "wednesday": "Mercredi",
+      "thursday": "Jeudi",
+      "friday": "Vendredi",
+      "saturday": "Samedi",
+      "sunday": "Dimanche"
+    }
+  },
+  "pricing": {
+    "free": "Gratuit",
+    "mixed": "Gratuit et payant",
+    "mixedWithTier": "Gratuit et payant · $tier",
+    "tier1": "€ Abordable",
+    "tier2": "€€ Prix moyen",
+    "tier3": "€€€ Cher",
+    "tier4": "€€€€ Très cher"
+  },
+  "badges": {
+    "allAges": "Tous âges",
+    "babies": "Bébé (0-1)",
+    "toddlers": "0-3 ans",
+    "kids": "3-6 ans",
+    "olderKids": "6+ ans"
+  },
+  "fallbacks": {
+    "place": "Lieu",
+    "addressUnavailable": "Adresse indisponible",
+    "restaurant": "Restaurant",
+    "park": "Parc",
+    "museum": "Musée",
+    "activity": "Activité"
+  }
+}

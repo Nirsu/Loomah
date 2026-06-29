@@ -1,0 +1,12 @@
+{
+  "title": "Favoris",
+  "savedPlaces(param=count)": {
+    "one": "1 lieu sauvegardé",
+    "other": "$count lieux sauvegardés"
+  },
+  "emptyTitle": "Aucun favori",
+  "emptySubtitle": "Ajoute des lieux depuis leur fiche pour les retrouver ici.",
+  "loadError": "Impossible de charger les favoris",
+  "retry": "Réessayer",
+  "addressUnavailable": "Adresse indisponible"
+}

@@ -12,6 +12,7 @@ import 'package:loomah/features/map/data/providers/nearby_places_provider.dart';
 import 'package:loomah/features/map/domain/models/place_mini_card_info.dart';
 import 'package:loomah/features/map/presentation/pages/place_details_page.dart';
 import 'package:loomah/features/map/presentation/widgets/place_mini_card_info_widget.dart';
+import 'package:loomah/i18n/strings.g.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -149,19 +150,20 @@ class _CustomMapWidgetState extends ConsumerState<CustomMapWidget> {
   }
 
   PlaceMiniCardInfo? _extractPlaceMiniInfo(Map<String?, Object?> feature) {
+    final Translations$map$fr map = Translations.of(context).map;
     final Object? properties = feature['properties'];
     if (properties is! Map) return null;
 
     final String placeName =
         properties['name']?.toString().trim().isNotEmpty == true
         ? properties['name'].toString()
-        : 'Lieu';
+        : map.fallbacks.place;
 
     final String iconName = properties['icon']?.toString() ?? '';
-    final String typeText = _textFromName(iconName);
+    final String typeText = _textFromName(map, iconName);
 
     final Object? addressRaw = properties['address'];
-    String addressText = 'Adresse indisponible';
+    String addressText = map.fallbacks.addressUnavailable;
     if (addressRaw is Map) {
       final String street = addressRaw['street']?.toString() ?? '';
       final String city = addressRaw['city']?.toString() ?? '';
@@ -191,18 +193,18 @@ class _CustomMapWidgetState extends ConsumerState<CustomMapWidget> {
     );
   }
 
-  String _textFromName(String iconName) {
+  String _textFromName(Translations$map$fr map, String iconName) {
     switch (iconName.toLowerCase()) {
       case 'restaurant':
-        return 'Restaurant';
+        return map.fallbacks.restaurant;
       case 'park':
-        return 'Parc';
+        return map.fallbacks.park;
       case 'museum':
-        return 'Musée';
+        return map.fallbacks.museum;
       case 'activity':
-        return 'Activité';
+        return map.fallbacks.activity;
       default:
-        return 'Lieu';
+        return map.fallbacks.place;
     }
   }
 

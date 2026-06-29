@@ -1,0 +1,57 @@
+{
+  "actions": {
+    "openMaps": "Open in Maps",
+    "website": "Website",
+    "call": "Call"
+  },
+  "details": {
+    "error": "Something went wrong",
+    "readMore": "Read more",
+    "readLess": "Show less",
+    "seeDetails": "See details"
+  },
+  "practical": {
+    "title": "Practical info",
+    "website": "Website"
+  },
+  "opening": {
+    "title": "Opening hours",
+    "closed": "CLOSED",
+    "today": "Today",
+    "closedToday": "Closed today",
+    "openToday": "Open today $hours",
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    }
+  },
+  "pricing": {
+    "free": "Free",
+    "mixed": "Free and paid",
+    "mixedWithTier": "Free and paid · $tier",
+    "tier1": "€ Affordable",
+    "tier2": "€€ Mid-range",
+    "tier3": "€€€ Expensive",
+    "tier4": "€€€€ Very expensive"
+  },
+  "badges": {
+    "allAges": "All ages",
+    "babies": "Baby (0-1)",
+    "toddlers": "0-3 years",
+    "kids": "3-6 years",
+    "olderKids": "6+ years"
+  },
+  "fallbacks": {
+    "place": "Place",
+    "addressUnavailable": "Address unavailable",
+    "restaurant": "Restaurant",
+    "park": "Park",
+    "museum": "Museum",
+    "activity": "Activity"
+  }
+}

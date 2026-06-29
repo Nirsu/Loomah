@@ -13,6 +13,7 @@ import 'package:loomah/features/map/presentation/widgets/place_badges_wrap.dart'
 import 'package:loomah/features/map/presentation/widgets/place_opening_hours.dart';
 import 'package:loomah/features/map/presentation/widgets/place_practical_info.dart';
 import 'package:loomah/features/map/presentation/widgets/place_quick_facts.dart';
+import 'package:loomah/i18n/strings.g.dart';
 import 'package:loomah/theme/loomah_theme.dart';
 
 /// Page to display the details of a place.
@@ -43,6 +44,7 @@ class PlaceDetailsPage extends ConsumerWidget {
 
     final LoomahPalette palette = Theme.of(context).extension<LoomahPalette>()!;
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final Translations$map$fr map = Translations.of(context).map;
 
     return Scaffold(
       backgroundColor: palette.background,
@@ -149,7 +151,7 @@ class PlaceDetailsPage extends ConsumerWidget {
           child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16),
-              child: Text('An error occurred'),
+              child: Text(map.details.error),
             ),
           ),
         ),
@@ -174,6 +176,7 @@ class _DescriptionTextState extends State<_DescriptionText> {
   Widget build(BuildContext context) {
     final LoomahPalette palette = context.loomahPalette;
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final Translations$map$fr map = Translations.of(context).map;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,7 +198,9 @@ class _DescriptionTextState extends State<_DescriptionText> {
               foregroundColor: palette.accentSecondary,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
-            child: Text(_expanded ? 'Voir moins' : 'Lire plus'),
+            child: Text(
+              _expanded ? map.details.readLess : map.details.readMore,
+            ),
           ),
       ],
     );

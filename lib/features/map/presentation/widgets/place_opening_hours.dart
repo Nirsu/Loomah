@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:loomah/features/map/data/models/place_details.dart';
+import 'package:loomah/i18n/strings.g.dart';
 import 'package:loomah/theme/loomah_theme.dart';
 
 typedef _OpeningDay = ({
@@ -22,27 +23,52 @@ class PlaceOpeningHours extends StatelessWidget {
 
     final LoomahPalette palette = Theme.of(context).extension<LoomahPalette>()!;
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final Translations$map$fr map = Translations.of(context).map;
     final OpeningHours hours = openingHours!;
     final int today = DateTime.now().weekday;
     final List<_OpeningDay> days = <_OpeningDay>[
-      (label: 'Lundi', periods: hours.monday, weekday: DateTime.monday),
-      (label: 'Mardi', periods: hours.tuesday, weekday: DateTime.tuesday),
       (
-        label: 'Mercredi',
+        label: map.opening.days.monday,
+        periods: hours.monday,
+        weekday: DateTime.monday,
+      ),
+      (
+        label: map.opening.days.tuesday,
+        periods: hours.tuesday,
+        weekday: DateTime.tuesday,
+      ),
+      (
+        label: map.opening.days.wednesday,
         periods: hours.wednesday,
         weekday: DateTime.wednesday,
       ),
-      (label: 'Jeudi', periods: hours.thursday, weekday: DateTime.thursday),
-      (label: 'Vendredi', periods: hours.friday, weekday: DateTime.friday),
-      (label: 'Samedi', periods: hours.saturday, weekday: DateTime.saturday),
-      (label: 'Dimanche', periods: hours.sunday, weekday: DateTime.sunday),
+      (
+        label: map.opening.days.thursday,
+        periods: hours.thursday,
+        weekday: DateTime.thursday,
+      ),
+      (
+        label: map.opening.days.friday,
+        periods: hours.friday,
+        weekday: DateTime.friday,
+      ),
+      (
+        label: map.opening.days.saturday,
+        periods: hours.saturday,
+        weekday: DateTime.saturday,
+      ),
+      (
+        label: map.opening.days.sunday,
+        periods: hours.sunday,
+        weekday: DateTime.sunday,
+      ),
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          'Horaires',
+          map.opening.title,
           style: textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.w800,
             color: palette.textDark,
@@ -56,6 +82,8 @@ class PlaceOpeningHours extends StatelessWidget {
             palette: palette,
             textTheme: textTheme,
             isToday: today == day.weekday,
+            todayLabel: map.opening.today,
+            closedLabel: map.opening.closed,
           ),
           if (day.weekday != DateTime.sunday) const SizedBox(height: 8),
         ],
@@ -65,15 +93,19 @@ class PlaceOpeningHours extends StatelessWidget {
 }
 
 /// Summary of today's opening hours.
-String? todayOpeningHoursLabel(OpeningHours? openingHours) {
+String? todayOpeningHoursLabel(
+  BuildContext context,
+  OpeningHours? openingHours,
+) {
   if (openingHours == null) return null;
 
+  final Translations$map$fr map = Translations.of(context).map;
   final List<OpeningPeriod> periods =
       _periodsForWeekday(openingHours, DateTime.now().weekday) ??
       const <OpeningPeriod>[];
-  if (periods.isEmpty) return "Fermé aujourd'hui";
+  if (periods.isEmpty) return map.opening.closedToday;
 
-  return "Ouvert aujourd'hui ${_formatPeriods(periods)}";
+  return map.opening.openToday(hours: _formatPeriods(periods));
 }
 
 class _DayRow extends StatelessWidget {
@@ -83,6 +115,8 @@ class _DayRow extends StatelessWidget {
     required this.palette,
     required this.textTheme,
     required this.isToday,
+    required this.todayLabel,
+    required this.closedLabel,
   });
 
   final String day;
@@ -90,12 +124,14 @@ class _DayRow extends StatelessWidget {
   final LoomahPalette palette;
   final TextTheme textTheme;
   final bool isToday;
+  final String todayLabel;
+  final String closedLabel;
 
   @override
   Widget build(BuildContext context) {
     final List<OpeningPeriod> dayPeriods = periods ?? const <OpeningPeriod>[];
     final String timeText = dayPeriods.isEmpty
-        ? 'FERMÉ'
+        ? closedLabel
         : _formatPeriods(dayPeriods);
 
     return DecoratedBox(
@@ -110,7 +146,7 @@ class _DayRow extends StatelessWidget {
             SizedBox(
               width: 96,
               child: Text(
-                isToday ? "Aujourd'hui" : day,
+                isToday ? todayLabel : day,
                 style: textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                   color: isToday ? palette.accentSecondary : palette.textDark,

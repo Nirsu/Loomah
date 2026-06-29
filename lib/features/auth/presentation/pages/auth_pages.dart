@@ -4,6 +4,7 @@ import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loomah/features/auth/application/auth_controller.dart';
+import 'package:loomah/i18n/strings.g.dart';
 import 'package:loomah/theme/loomah_theme.dart';
 
 /// Splash page used while restoring the session.
@@ -59,10 +60,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final AuthState auth = ref.watch(authControllerProvider);
+    final Translations$auth$fr authText = Translations.of(context).auth;
 
     return _AuthScaffold(
-      title: 'Content de te revoir',
-      subtitle: 'Connecte-toi pour retrouver tes lieux et tes favoris.',
+      title: authText.login.title,
+      subtitle: authText.login.subtitle,
       icon: LucideIcons.sparkles,
       child: Form(
         key: _formKey,
@@ -76,20 +78,20 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: () => context.push(ForgotPasswordPage.route),
-                child: const Text('Mot de passe oublié ?'),
+                child: Text(authText.login.forgotPassword),
               ),
             ),
             _ErrorText(auth.error),
             const SizedBox(height: 8),
             _SubmitButton(
-              label: 'Se connecter',
+              label: authText.login.submit,
               isBusy: auth.isBusy,
               onPressed: _submit,
             ),
             const SizedBox(height: 18),
             _SwitchAuthLink(
-              text: 'Pas encore de compte ?',
-              action: 'Créer un compte',
+              text: authText.login.switchText,
+              action: authText.login.switchAction,
               onTap: () => context.go(RegisterPage.route),
             ),
           ],
@@ -147,10 +149,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     final AuthState auth = ref.watch(authControllerProvider);
+    final Translations$auth$fr authText = Translations.of(context).auth;
 
     return _AuthScaffold(
-      title: 'Bienvenue sur Loomah',
-      subtitle: 'Crée ton compte pour sauvegarder tes découvertes.',
+      title: authText.register.title,
+      subtitle: authText.register.subtitle,
       icon: LucideIcons.user_round_plus,
       child: Form(
         key: _formKey,
@@ -159,9 +162,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
           children: <Widget>[
             _AuthTextField(
               controller: _usernameController,
-              label: 'Nom d’utilisateur',
+              label: authText.register.usernameLabel,
               icon: LucideIcons.user_round,
-              validator: _required,
+              validator: (String? value) =>
+                  _required(value, authText.validation.required),
             ),
             const SizedBox(height: 14),
             _EmailField(controller: _emailController),
@@ -170,14 +174,14 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             const SizedBox(height: 18),
             _ErrorText(auth.error),
             _SubmitButton(
-              label: 'Créer mon compte',
+              label: authText.register.submit,
               isBusy: auth.isBusy,
               onPressed: _submit,
             ),
             const SizedBox(height: 18),
             _SwitchAuthLink(
-              text: 'Déjà inscrit ?',
-              action: 'Se connecter',
+              text: authText.register.switchText,
+              action: authText.register.switchAction,
               onTap: () => context.go(LoginPage.route),
             ),
           ],
@@ -232,10 +236,11 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
   @override
   Widget build(BuildContext context) {
     final AuthState auth = ref.watch(authControllerProvider);
+    final Translations$auth$fr authText = Translations.of(context).auth;
 
     return _AuthScaffold(
-      title: 'Réinitialiser le mot de passe',
-      subtitle: 'Entre ton email pour recevoir un code à 6 chiffres.',
+      title: authText.forgotPassword.title,
+      subtitle: authText.forgotPassword.subtitle,
       icon: LucideIcons.mail,
       child: Form(
         key: _formKey,
@@ -246,13 +251,13 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
             const SizedBox(height: 18),
             _ErrorText(auth.error),
             _SubmitButton(
-              label: 'Recevoir le code',
+              label: authText.forgotPassword.submit,
               isBusy: auth.isBusy,
               onPressed: _submit,
             ),
             const SizedBox(height: 12),
             _SecondaryButton(
-              label: 'Retour',
+              label: authText.forgotPassword.back,
               onPressed: auth.isBusy ? null : _goBack,
             ),
           ],
@@ -327,11 +332,11 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
   @override
   Widget build(BuildContext context) {
     final AuthState auth = ref.watch(authControllerProvider);
+    final Translations$auth$fr authText = Translations.of(context).auth;
 
     return _AuthScaffold(
-      title: 'Nouveau mot de passe',
-      subtitle:
-          'Saisis le code reçu par email et choisis un nouveau mot de passe.',
+      title: authText.resetPassword.title,
+      subtitle: authText.resetPassword.subtitle,
       icon: LucideIcons.key_round,
       child: Form(
         key: _formKey,
@@ -342,10 +347,11 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
             const SizedBox(height: 14),
             _AuthTextField(
               controller: _codeController,
-              label: 'Code à 6 chiffres',
+              label: authText.resetPassword.codeLabel,
               icon: LucideIcons.binary,
               keyboardType: TextInputType.number,
-              validator: _codeValidator,
+              validator: (String? value) =>
+                  _codeValidator(value, authText.validation.invalidCode),
               inputFormatters: <TextInputFormatter>[
                 FilteringTextInputFormatter.digitsOnly,
                 LengthLimitingTextInputFormatter(6),
@@ -356,14 +362,14 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
             const SizedBox(height: 18),
             _ErrorText(auth.error),
             _SubmitButton(
-              label: 'Changer le mot de passe',
+              label: authText.resetPassword.submit,
               isBusy: auth.isBusy,
               onPressed: _submit,
             ),
             const SizedBox(height: 18),
             _SwitchAuthLink(
-              text: 'Retour à la connexion',
-              action: 'Se connecter',
+              text: authText.resetPassword.switchText,
+              action: authText.resetPassword.switchAction,
               onTap: () => context.go(LoginPage.route),
             ),
           ],
@@ -514,12 +520,18 @@ class _EmailField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Translations$auth$fr authText = Translations.of(context).auth;
+
     return _AuthTextField(
       controller: controller,
-      label: 'Email',
+      label: authText.fields.email,
       icon: LucideIcons.mail,
       keyboardType: TextInputType.emailAddress,
-      validator: _emailValidator,
+      validator: (String? value) => _emailValidator(
+        value,
+        requiredMessage: authText.validation.required,
+        invalidEmailMessage: authText.validation.invalidEmail,
+      ),
     );
   }
 }
@@ -531,12 +543,15 @@ class _PasswordField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Translations$auth$fr authText = Translations.of(context).auth;
+
     return _AuthTextField(
       controller: controller,
-      label: 'Mot de passe',
+      label: authText.fields.password,
       icon: LucideIcons.lock_keyhole,
       obscureText: true,
-      validator: _required,
+      validator: (String? value) =>
+          _required(value, authText.validation.required),
     );
   }
 }
@@ -666,29 +681,33 @@ class _ErrorText extends StatelessWidget {
   }
 }
 
-String? _required(String? value) {
+String? _required(String? value, String message) {
   if (value == null || value.trim().isEmpty) {
-    return 'Ce champ est requis.';
+    return message;
   }
 
   return null;
 }
 
-String? _emailValidator(String? value) {
-  final String? requiredError = _required(value);
+String? _emailValidator(
+  String? value, {
+  required String requiredMessage,
+  required String invalidEmailMessage,
+}) {
+  final String? requiredError = _required(value, requiredMessage);
   if (requiredError != null) {
     return requiredError;
   }
   if (!value!.contains('@')) {
-    return 'Entre un email valide.';
+    return invalidEmailMessage;
   }
 
   return null;
 }
 
-String? _codeValidator(String? value) {
+String? _codeValidator(String? value, String message) {
   if (value == null || !RegExp(r'^\d{6}$').hasMatch(value)) {
-    return 'Entre le code à 6 chiffres.';
+    return message;
   }
 
   return null;

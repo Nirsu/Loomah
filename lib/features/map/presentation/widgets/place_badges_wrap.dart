@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:loomah/features/map/data/models/place_details.dart';
 import 'package:loomah/features/map/presentation/widgets/place_badge.dart';
 import 'package:loomah/features/map/presentation/widgets/place_pricing_label.dart';
+import 'package:loomah/i18n/strings.g.dart';
 import 'package:loomah/theme/loomah_theme.dart';
 
 /// Widget to display badges for a place.
@@ -26,7 +27,8 @@ class PlaceBadgesWrap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final LoomahPalette palette = Theme.of(context).extension<LoomahPalette>()!;
-    final String? pricingLabel = placePricingLabel(pricing);
+    final Translations$map$fr map = Translations.of(context).map;
+    final String? pricingLabel = placePricingLabel(context, pricing);
     final List<Widget> children = <Widget>[
       PlaceBadge(
         text: type,
@@ -43,7 +45,7 @@ class PlaceBadgesWrap extends StatelessWidget {
       if (allTrue) {
         children.add(
           PlaceBadge(
-            text: 'Tous âges',
+            text: map.badges.allAges,
             bgColor: palette.pastelMint,
             textColor: palette.accentGreen,
           ),
@@ -52,7 +54,7 @@ class PlaceBadgesWrap extends StatelessWidget {
         if (ranges.babies) {
           children.add(
             PlaceBadge(
-              text: 'Bébé (0-1)',
+              text: map.badges.babies,
               bgColor: palette.pastelMint,
               textColor: palette.accentGreen,
             ),
@@ -61,7 +63,7 @@ class PlaceBadgesWrap extends StatelessWidget {
         if (ranges.toddlers) {
           children.add(
             PlaceBadge(
-              text: '0-3 ans',
+              text: map.badges.toddlers,
               bgColor: palette.pastelMint,
               textColor: palette.accentGreen,
             ),
@@ -70,7 +72,7 @@ class PlaceBadgesWrap extends StatelessWidget {
         if (ranges.kids) {
           children.add(
             PlaceBadge(
-              text: '3-6 ans',
+              text: map.badges.kids,
               bgColor: palette.pastelMint,
               textColor: palette.accentGreen,
             ),
@@ -79,7 +81,7 @@ class PlaceBadgesWrap extends StatelessWidget {
         if (ranges.olderKids) {
           children.add(
             PlaceBadge(
-              text: '6+ ans',
+              text: map.badges.olderKids,
               bgColor: palette.pastelMint,
               textColor: palette.accentGreen,
             ),

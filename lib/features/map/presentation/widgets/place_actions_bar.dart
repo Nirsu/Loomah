@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:loomah/features/map/data/models/place_details.dart';
 import 'package:loomah/features/map/presentation/widgets/place_launchers.dart';
+import 'package:loomah/i18n/strings.g.dart';
 import 'package:loomah/theme/loomah_theme.dart';
 
 /// Bottom actions for a place details page.
@@ -16,6 +17,7 @@ class PlaceActionsBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final LoomahPalette palette = context.loomahPalette;
+    final Translations$map$fr map = Translations.of(context).map;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -34,7 +36,7 @@ class PlaceActionsBar extends StatelessWidget {
                 child: FilledButton.icon(
                   onPressed: () => unawaited(openPlaceInMaps(place)),
                   icon: const Icon(Icons.map_outlined),
-                  label: const Text('Ouvrir dans Maps'),
+                  label: Text(map.actions.openMaps),
                   style: FilledButton.styleFrom(
                     backgroundColor: palette.accentPrimary,
                     foregroundColor: Colors.white,
@@ -49,7 +51,7 @@ class PlaceActionsBar extends StatelessWidget {
                 const SizedBox(width: 10),
                 _ActionIconButton(
                   icon: Icons.language_rounded,
-                  tooltip: 'Site web',
+                  tooltip: map.actions.website,
                   onPressed: () => unawaited(openPlaceUrl(place.website!)),
                 ),
               ],
@@ -57,7 +59,7 @@ class PlaceActionsBar extends StatelessWidget {
                 const SizedBox(width: 10),
                 _ActionIconButton(
                   icon: Icons.phone_rounded,
-                  tooltip: 'Appeler',
+                  tooltip: map.actions.call,
                   onPressed: () => unawaited(callPlacePhone(place.phone!)),
                 ),
               ],

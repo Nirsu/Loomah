@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:loomah/features/map/data/models/place_details.dart';
 import 'package:loomah/features/map/presentation/widgets/place_launchers.dart';
+import 'package:loomah/i18n/strings.g.dart';
 import 'package:loomah/theme/loomah_theme.dart';
 
 /// Widget to display practical information about a place.
@@ -17,12 +18,13 @@ class PlacePracticalInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     final LoomahPalette palette = Theme.of(context).extension<LoomahPalette>()!;
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final Translations$map$fr map = Translations.of(context).map;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          'Infos pratiques',
+          map.practical.title,
           style: textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.w900,
             color: palette.textDark,
@@ -40,7 +42,7 @@ class PlacePracticalInfo extends StatelessWidget {
         if (place.website != null) ...<Widget>[
           _InfoRow(
             icon: Icons.language_rounded,
-            label: 'Site web',
+            label: map.practical.website,
             onTap: () => unawaited(openPlaceUrl(place.website!)),
             showChevron: true,
           ),

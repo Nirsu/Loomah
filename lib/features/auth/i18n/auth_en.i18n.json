@@ -1,0 +1,45 @@
+{
+  "login": {
+    "title": "Good to see you again",
+    "subtitle": "Sign in to find your places and favorites.",
+    "forgotPassword": "Forgot password?",
+    "submit": "Sign in",
+    "switchText": "No account yet?",
+    "switchAction": "Create an account"
+  },
+  "register": {
+    "title": "Welcome to Loomah",
+    "subtitle": "Create your account to save your discoveries.",
+    "usernameLabel": "Username",
+    "submit": "Create my account",
+    "switchText": "Already registered?",
+    "switchAction": "Sign in"
+  },
+  "forgotPassword": {
+    "title": "Reset password",
+    "subtitle": "Enter your email to receive a 6-digit code.",
+    "submit": "Receive the code",
+    "back": "Back"
+  },
+  "resetPassword": {
+    "title": "New password",
+    "subtitle": "Enter the code received by email and choose a new password.",
+    "codeLabel": "6-digit code",
+    "submit": "Change password",
+    "switchText": "Back to sign in",
+    "switchAction": "Sign in"
+  },
+  "fields": {
+    "email": "Email",
+    "password": "Password"
+  },
+  "validation": {
+    "required": "This field is required.",
+    "invalidEmail": "Enter a valid email.",
+    "invalidCode": "Enter the 6-digit code."
+  },
+  "errors": {
+    "invalidCredentials": "Email or password is incorrect.",
+    "generic": "Something went wrong. Try again in a moment."
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "login": {
+    "title": "Content de te revoir",
+    "subtitle": "Connecte-toi pour retrouver tes lieux et tes favoris.",
+    "forgotPassword": "Mot de passe oublié ?",
+    "submit": "Se connecter",
+    "switchText": "Pas encore de compte ?",
+    "switchAction": "Créer un compte"
+  },
+  "register": {
+    "title": "Bienvenue sur Loomah",
+    "subtitle": "Crée ton compte pour sauvegarder tes découvertes.",
+    "usernameLabel": "Nom d'utilisateur",
+    "submit": "Créer mon compte",
+    "switchText": "Déjà inscrit ?",
+    "switchAction": "Se connecter"
+  },
+  "forgotPassword": {
+    "title": "Réinitialiser le mot de passe",
+    "subtitle": "Entre ton email pour recevoir un code à 6 chiffres.",
+    "submit": "Recevoir le code",
+    "back": "Retour"
+  },
+  "resetPassword": {
+    "title": "Nouveau mot de passe",
+    "subtitle": "Saisis le code reçu par email et choisis un nouveau mot de passe.",
+    "codeLabel": "Code à 6 chiffres",
+    "submit": "Changer le mot de passe",
+    "switchText": "Retour à la connexion",
+    "switchAction": "Se connecter"
+  },
+  "fields": {
+    "email": "Email",
+    "password": "Mot de passe"
+  },
+  "validation": {
+    "required": "Ce champ est requis.",
+    "invalidEmail": "Entre un email valide.",
+    "invalidCode": "Entre le code à 6 chiffres."
+  },
+  "errors": {
+    "invalidCredentials": "Email ou mot de passe incorrect.",
+    "generic": "Une erreur est survenue. Réessaie dans un instant."
+  }
+}

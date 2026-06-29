@@ -17,7 +17,8 @@ class PlaceQuickFacts extends StatelessWidget {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final List<String> facts = <String>[
       _areaLabel(place),
-      if (todayOpeningHoursLabel(place.openingHours) case final String hours)
+      if (todayOpeningHoursLabel(context, place.openingHours)
+          case final String hours)
         hours,
     ].where((String fact) => fact.isNotEmpty).toList();
 

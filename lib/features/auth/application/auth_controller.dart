@@ -5,6 +5,7 @@ import 'package:loomah/api/api_provider.dart';
 import 'package:loomah/features/auth/data/auth_api.dart';
 import 'package:loomah/features/auth/data/auth_token_storage.dart';
 import 'package:loomah/features/auth/data/models/auth_session.dart';
+import 'package:loomah/i18n/strings.g.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_controller.g.dart';
@@ -277,9 +278,9 @@ class AuthController extends _$AuthController {
     }
 
     if (error is DioException && error.response?.statusCode == 401) {
-      return 'Email ou mot de passe incorrect.';
+      return t.auth.errors.invalidCredentials;
     }
 
-    return 'Une erreur est survenue. Réessaie dans un instant.';
+    return t.auth.errors.generic;
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:loomah/features/map/domain/models/place_mini_card_info.dart';
+import 'package:loomah/i18n/strings.g.dart';
 import 'package:loomah/theme/loomah_theme.dart';
 
 /// A widget that displays a mini card with information about a place.
@@ -25,6 +26,7 @@ class PlaceMiniCardInfoWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final LoomahPalette palette = Theme.of(context).extension<LoomahPalette>()!;
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final Translations$map$fr map = Translations.of(context).map;
 
     return TapRegion(
       onTapOutside: (PointerDownEvent event) {
@@ -113,7 +115,7 @@ class PlaceMiniCardInfoWidget extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 child: Text(
-                  'Voir la fiche',
+                  map.details.seeDetails,
                   style: textTheme.labelLarge?.copyWith(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,

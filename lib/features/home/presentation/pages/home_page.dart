@@ -4,6 +4,7 @@ import 'package:loomah/features/favorite/presentation/pages/favorites_page.dart'
 import 'package:loomah/features/home/presentation/widgets/floating_bottom_nav_metrics.dart';
 import 'package:loomah/features/map/presentation/pages/map_page.dart';
 import 'package:loomah/features/profile/presentation/pages/profile_page.dart';
+import 'package:loomah/i18n/strings.g.dart';
 import 'package:loomah/theme/loomah_theme.dart';
 
 /// Main shell with bottom navigation.
@@ -64,15 +65,15 @@ class _LoomahBottomNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onDestinationSelected;
 
-  static const List<_NavDestination> _destinations = <_NavDestination>[
-    _NavDestination(icon: LucideIcons.map_pinned, label: 'Carte'),
-    _NavDestination(icon: LucideIcons.heart, label: 'Favoris'),
-    _NavDestination(icon: LucideIcons.user_round, label: 'Profil'),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final LoomahPalette palette = context.loomahPalette;
+    final Translations$home$fr home = Translations.of(context).home;
+    final List<_NavDestination> destinations = <_NavDestination>[
+      _NavDestination(icon: LucideIcons.map_pinned, label: home.nav.map),
+      _NavDestination(icon: LucideIcons.heart, label: home.nav.favorites),
+      _NavDestination(icon: LucideIcons.user_round, label: home.nav.profile),
+    ];
 
     return SafeArea(
       top: false,
@@ -108,7 +109,7 @@ class _LoomahBottomNavBar extends StatelessWidget {
             child: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
                 final double itemWidth =
-                    constraints.maxWidth / _destinations.length;
+                    constraints.maxWidth / destinations.length;
 
                 return SizedBox(
                   height: FloatingBottomNavMetrics.itemHeight,
@@ -135,22 +136,21 @@ class _LoomahBottomNavBar extends StatelessWidget {
                       ),
                       Positioned.fill(
                         child: Row(
-                          children: List<Widget>.generate(
-                            _destinations.length,
-                            (int index) {
-                              final _NavDestination destination =
-                                  _destinations[index];
-                              final bool isSelected = index == currentIndex;
+                          children: List<Widget>.generate(destinations.length, (
+                            int index,
+                          ) {
+                            final _NavDestination destination =
+                                destinations[index];
+                            final bool isSelected = index == currentIndex;
 
-                              return Expanded(
-                                child: _LoomahNavItem(
-                                  destination: destination,
-                                  isSelected: isSelected,
-                                  onTap: () => onDestinationSelected(index),
-                                ),
-                              );
-                            },
-                          ),
+                            return Expanded(
+                              child: _LoomahNavItem(
+                                destination: destination,
+                                isSelected: isSelected,
+                                onTap: () => onDestinationSelected(index),
+                              ),
+                            );
+                          }),
                         ),
                       ),
                     ],
